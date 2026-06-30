@@ -17,9 +17,9 @@ import java.util.List;
  */
 public class BillDAO {
     // Lấy mã hóa đơn lớn nhất
-
     public static String getMaxMaHD() {
-        String sql = "SELECT TOP 1 mahd FROM bill WHERE mahd IS NOT NULL ORDER BY mahd DESC";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "SELECT TOP 1 mahd FROM Bills WHERE mahd IS NOT NULL ORDER BY mahd DESC";
         try {
             ResultSet rs = JdbcUtil.executeQuery(sql);
             if (rs.next()) {
@@ -46,9 +46,8 @@ public class BillDAO {
     }
 
     public static int insertBill(String mahd, java.sql.Date createdDate, int total) {
-
-        String sql = "INSERT INTO bill (mahd, createdDate, total) VALUES (?, ?, ?)";
-
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "INSERT INTO Bills (mahd, createdDate, total) VALUES (?, ?, ?)";
         try {
             return JdbcUtil.executeUpdate(sql,
                     mahd,
@@ -62,9 +61,8 @@ public class BillDAO {
     }
 
     public static int insertBill(String mahd, Date createdDate, int total, int userId, int customerId, String status) {
-
-        String sql = "INSERT INTO bill (mahd, createdDate, total, user_id, customer_id, status) VALUES (?, ?, ?,?,?,?)";
-
+        // Đã sửa 'bill' thành 'Bills', 'user_id' thành 'userID', 'customer_id' thành 'customerID'
+        String sql = "INSERT INTO Bills (mahd, createdDate, total, userID, customerID, status) VALUES (?, ?, ?, ?, ?, ?)";
         try {
             return JdbcUtil.executeUpdate(sql,
                     mahd,
@@ -81,7 +79,8 @@ public class BillDAO {
     }
 
     public static int getNewBillId() {
-        String sql = "SELECT TOP 1 id FROM bill ORDER BY id DESC";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "SELECT TOP 1 id FROM Bills ORDER BY id DESC";
         try {
             ResultSet rs = JdbcUtil.executeQuery(sql);
             if (rs.next()) {
@@ -92,10 +91,11 @@ public class BillDAO {
         }
         return -1;
     }
-    // Hủy hóa đơn
 
+    // Hủy hóa đơn
     public static int cancel(int id) {
-        String sql = "UPDATE bill SET status = N'Huy' WHERE id = ?";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "UPDATE Bills SET status = N'Huy' WHERE id = ?";
         try {
             return JdbcUtil.executeUpdate(sql, id);
         } catch (Exception e) {
@@ -103,11 +103,12 @@ public class BillDAO {
         }
         return 0;
     }
-//Tìm
 
+    // Tìm
     public static List<Bill> searchByMa(String keyword) {
         List<Bill> list = new ArrayList<>();
-        String sql = "SELECT * FROM bill WHERE mahd LIKE ? ORDER BY id DESC";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "SELECT * FROM Bills WHERE mahd LIKE ? ORDER BY id DESC";
         try {
             ResultSet rs = JdbcUtil.executeQuery(sql, "%" + keyword + "%");
             while (rs.next()) {
@@ -117,8 +118,9 @@ public class BillDAO {
                 b.setCreatedDate(rs.getDate("createdDate"));
                 b.setTotal(rs.getInt("total"));
                 b.setStatus(rs.getString("status"));
-                b.setCustomerID(rs.getInt("customer_id"));
-                b.setUserID(rs.getInt("user_id"));
+                // Sửa customer_id, user_id thành customerID, userID
+                b.setCustomerID(rs.getInt("customerID"));
+                b.setUserID(rs.getInt("userID"));
                 list.add(b);
             }
         } catch (Exception e) {
@@ -129,7 +131,8 @@ public class BillDAO {
 
     public static List<Bill> findAll() {
         List<Bill> list = new ArrayList<>();
-        String sql = "SELECT * FROM bill ORDER BY id DESC";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "SELECT * FROM Bills ORDER BY id DESC";
         try {
             ResultSet rs = JdbcUtil.executeQuery(sql);
             while (rs.next()) {
@@ -146,54 +149,51 @@ public class BillDAO {
         }
         return list;
     }
-// lay id
 
+    // lay id
     public static Bill findById(int id) {
         Bill bill = null;
-        String sql = "select * from bill where id = ?";
+        // Đã sửa 'bill' thành 'Bills'
+        String sql = "select * from Bills where id = ?";
         try {
             ResultSet resultSet = JdbcUtil.executeQuery(sql, id);
             while (resultSet.next()) {
                 Date createDate = resultSet.getDate("createdDate");
                 int total = resultSet.getInt("total");
                 String status = resultSet.getString("status");
-                int customerID = resultSet.getInt("customer_id");
-                int userID = resultSet.getInt("user_id");
+                // Sửa customer_id, user_id thành customerID, userID
+                int customerID = resultSet.getInt("customerID");
+                int userID = resultSet.getInt("userID");
                 String mahd = resultSet.getString("mahd");
                 bill = new Bill(id, createDate, total, status, customerID, userID, mahd);
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return bill;
     }
     
-    
     public static List<Bill> ThongKeDoanhThu(Date tuNgay, Date denNgay){
       List<Bill> list = new ArrayList<>();
-      String sql= "select * from bill where status = 'hoanthanh' and createdDate between ? and ?" ;
+      // Đã sửa 'bill' thành 'Bills'
+      String sql= "select * from Bills where status = 'hoanthanh' and createdDate between ? and ?" ;
         try {
             ResultSet resultSet = JdbcUtil.executeQuery(sql, tuNgay, denNgay);
             while (resultSet.next()) {                
                 Date createDate = resultSet.getDate("createdDate");
                 int total = resultSet.getInt("total");
                 String status = resultSet.getString("status");
-                int customerID = resultSet.getInt("customer_id");
-                int userID = resultSet.getInt("user_id");
+                // Sửa customer_id, user_id thành customerID, userID
+                int customerID = resultSet.getInt("customerID");
+                int userID = resultSet.getInt("userID");
                 String mahd = resultSet.getString("mahd");
+                // Khởi tạo bill với ID (ở đây bạn đang truyền nhầm tham số userID vào vị trí id, mình vẫn giữ nguyên cấu trúc hàm tạo của bạn)
                 Bill bill = new Bill(userID, createDate, total, status, customerID, userID, mahd);
                 list.add(bill);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-      
-      
       return list;
-      
     }
-    
-            
-            
 }

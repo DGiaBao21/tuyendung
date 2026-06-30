@@ -28,7 +28,7 @@ import javax.swing.table.DefaultTableModel;
  */
 public class BanHangJFrame extends javax.swing.JFrame {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BanHangJFrame.class.getName());
+   private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(BanHangJFrame.class.getName());
     List<Product> list = new ArrayList<>();
     List<BillDetails> listBillDetail = new ArrayList<>();
     Bill bill = new Bill();
@@ -247,36 +247,37 @@ public class BanHangJFrame extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(lblTenKhachHang, javax.swing.GroupLayout.PREFERRED_SIZE, 268, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addGroup(jPanel2Layout.createSequentialGroup()
-                                        .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(txtTotal)))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(txtSDT, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(txtMaHoaDon, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
-                                    .addComponent(txtTienThua)
-                                    .addComponent(txtTienKhachDua, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
-                                    .addComponent(jScrollPane3)))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(btnLuu)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnLamMoi)
-                                .addGap(18, 18, 18)
-                                .addComponent(jButton2))
-                            .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel3)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGap(6, 6, 6)
+                            .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 55, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(txtSDT, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(txtMaHoaDon, javax.swing.GroupLayout.DEFAULT_SIZE, 260, Short.MAX_VALUE)
+                                        .addComponent(txtTienThua)
+                                        .addComponent(txtTienKhachDua, javax.swing.GroupLayout.DEFAULT_SIZE, 254, Short.MAX_VALUE)
+                                        .addComponent(jScrollPane3)))
+                                .addGroup(jPanel2Layout.createSequentialGroup()
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                    .addComponent(txtTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addGap(218, 218, 218))))
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addComponent(btnLuu)
+                            .addGap(18, 18, 18)
+                            .addComponent(btnLamMoi)
+                            .addGap(18, 18, 18)
+                            .addComponent(jButton2))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 372, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -353,14 +354,15 @@ public class BanHangJFrame extends javax.swing.JFrame {
     private void btnLuuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLuuActionPerformed
         // TODO add your handling code here:
         //
-        User user = Auth.user;
-        
+   User user = Auth.user;
         
         try {
             //Lấy dữ liệu hóa đơn
             String mahd = txtMaHoaDon.getText().trim();
             String sdt = txtSDT.getText().trim();
-            int tongTien = Integer.parseInt(txtTotal.getText().trim());
+            
+            // XÓA DẤU PHẨY ĐỂ TRÁNH LỖI KHI PARSE INT
+            int tongTien = Integer.parseInt(txtTotal.getText().trim().replace(",", "").replace(".", ""));
 
             // xử lý ngày
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -377,7 +379,7 @@ public class BanHangJFrame extends javax.swing.JFrame {
             // Lấy id hóa đơn vừa thêm
             int billId = BillDAO.getNewBillId();
 
-            //  Lưu 
+            //  Lưu chi tiết
             DefaultTableModel model = (DefaultTableModel) tblChiTiet.getModel();
 
             for (int i = 0; i < model.getRowCount(); i++) {
@@ -401,7 +403,15 @@ public class BanHangJFrame extends javax.swing.JFrame {
 
     private void btnChonSanPhamActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnChonSanPhamActionPerformed
         // TODO add your handling code here:
+// Lấy dòng được chọn trên bảng sản phẩm
         int index = tblSanPham.getSelectedRow();
+        
+        // Bắt lỗi nếu người dùng chưa chọn dòng nào
+        if (index < 0) {
+            JOptionPane.showMessageDialog(this, "Vui lòng chọn một sản phẩm từ bảng trước khi ấn nút!");
+            return;
+        }
+        
         Product product = list.get(index);
         int qty = 1;
         boolean newadd = true;
@@ -443,28 +453,28 @@ public class BanHangJFrame extends javax.swing.JFrame {
 
     private void btnLamMoiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLamMoiActionPerformed
         // TODO add your handling code here:
-       txtMaHoaDon.setText("");
-    txtNgay.setText("");
-    txtSDT.setText("");
-    txtTotal.setText("");
-    txtTienKhachDua.setText("");
-    txtTienThua.setText("");
+     txtMaHoaDon.setText("");
+        txtNgay.setText("");
+        txtSDT.setText("");
+        txtTotal.setText("");
+        txtTienKhachDua.setText("");
+        txtTienThua.setText("");
 
-    // Xóa bảng chi tiết hóa đơn
-    javax.swing.table.DefaultTableModel model =
-            (javax.swing.table.DefaultTableModel) tblChiTiet.getModel();
-    model.setRowCount(0);
+        // Xóa bảng chi tiết hóa đơn
+        javax.swing.table.DefaultTableModel model =
+                (javax.swing.table.DefaultTableModel) tblChiTiet.getModel();
+        model.setRowCount(0);
 
-    // Xóa list chi tiết trong bộ nhớ (nếu bạn đang dùng)
-    if (listBillDetail != null) {
-        listBillDetail.clear();
-    }
+        // Xóa list chi tiết trong bộ nhớ (nếu bạn đang dùng)
+        if (listBillDetail != null) {
+            listBillDetail.clear();
+        }
 
-    // Set lại ngày hôm nay (nếu bạn có hàm setNgayHomNay)
-    // setNgayHomNay();
+        // Set lại ngày hôm nay (nếu bạn có hàm setNgayHomNay)
+        setNgayHomNay();
 
-    // Sinh mã hóa đơn mới (nếu bạn có hàm này)
-    generateMaHoaDon();
+        // Sinh mã hóa đơn mới (nếu bạn có hàm này)
+        generateMaHoaDon();
     }//GEN-LAST:event_btnLamMoiActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -476,7 +486,7 @@ public class BanHangJFrame extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtMaHoaDonActionPerformed
     public void loadDataTableSanPham() {
-        String[] header = {"id", "ten", "so luong", "gia", "hinh", "loai sp"};
+       String[] header = {"id", "ten", "so luong", "gia", "hinh", "loai sp"};
         list = ProductDAO.findALL();
         DefaultTableModel model = new DefaultTableModel(header, 0);
         for (Product product : list) {
@@ -488,8 +498,7 @@ public class BanHangJFrame extends javax.swing.JFrame {
                 product.getImage(),
                 product.getCategoryID(),});
         }
-        tblSanPham.setModel(model);
-    }
+        tblSanPham.setModel(model);    }
 
    public void loadDataTableBillDetail() {
     String[] header = {"Ma SP", "Ten san pham", "So luong", "Gia", "Thanh tien"};
@@ -507,7 +516,7 @@ public class BanHangJFrame extends javax.swing.JFrame {
         });
     }
     tblChiTiet.setModel(model);
-    tongTien(); 
+    tongTien();
 }
 
 
@@ -534,16 +543,18 @@ public class BanHangJFrame extends javax.swing.JFrame {
 
     private void tinhTienThua() {
         try {
-            int tong = Integer.parseInt(txtTotal.getText().trim());
-            int dua = Integer.parseInt(txtTienKhachDua.getText().trim());
+        // Xóa cả phẩy và chấm trước khi tính toán
+        int tong = Integer.parseInt(txtTotal.getText().trim().replace(",", "").replace(".", ""));
+        int dua = Integer.parseInt(txtTienKhachDua.getText().trim().replace(",", "").replace(".", ""));
 
-            int thua = dua - tong;
+        int thua = dua - tong;
 
-            txtTienThua.setText(String.valueOf(thua));
+        // In ra tiền thừa (có thể thêm String.format("%,d", thua) nếu muốn có dấu phẩy cho đẹp)
+        txtTienThua.setText(String.valueOf(thua));
 
-        } catch (Exception e) {
-            txtTienThua.setText("0");
-        }
+    } catch (Exception e) {
+        txtTienThua.setText("0");
+    }
         
     }
 

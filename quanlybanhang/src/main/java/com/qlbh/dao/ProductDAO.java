@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.qlbh.dao;
 
 import com.qlbh.entity.Product;
@@ -15,10 +11,9 @@ import java.util.List;
  * @author PC
  */
 public class ProductDAO {
-    // THem
-
+    // THÊM
     public static int insert(String name, int price, int quantity, String image, int categoryId) {
-        String sql = "insert into products (name, price, quantity, image, category_id)values(?, ?, ?, ?, ?)";
+        String sql = "insert into products (name, price, quantity, image, categoryID) values(?, ?, ?, ?, ?)";
         try {
             int rs = JdbcUtil.executeUpdate(sql, name, price, quantity, image, categoryId);
             return rs;
@@ -28,9 +23,10 @@ public class ProductDAO {
         return 0;
     }
 
-// CAP NHAT
+    // CẬP NHẬT
     public static int update(Product p) {
-        String sql = "UPDATE products SET name=?, price=?, quantity=?, image=?, category_id=? WHERE id=?";
+        // Đã sửa category_id thành categoryID
+        String sql = "UPDATE products SET name=?, price=?, quantity=?, image=?, categoryID=? WHERE id=?";
         try {
             return JdbcUtil.executeUpdate(sql,
                     p.getName(),
@@ -45,8 +41,8 @@ public class ProductDAO {
         }
         return 0;
     }
-//Xóa
 
+    // Xóa
     public static int delete(int id) {
         String sql = "DELETE FROM products WHERE id = ?";
         try {
@@ -57,10 +53,9 @@ public class ProductDAO {
         return 0;
     }
 
-    // LẤY
+    // LẤY TẤT CẢ
     public static List<Product> findALL() {
         List<Product> list = new ArrayList<>();
-        // LẤY 
         String sql = "select * from products order by id desc";
         try {
             ResultSet resultSet = JdbcUtil.executeQuery(sql);
@@ -69,7 +64,9 @@ public class ProductDAO {
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
                 int price = resultSet.getInt("price");
-                int categoryId = resultSet.getInt("category_id");
+                
+                // Đã sửa category_id thành categoryID
+                int categoryId = resultSet.getInt("categoryID"); 
                 String image = resultSet.getString("image");
 
                 Product p = new Product(id, name, quantity, price, image, categoryId);
@@ -80,29 +77,27 @@ public class ProductDAO {
         }
         return list;
     }
-    // lay id
+    
+    // LẤY THEO ID
     public static Product findById(int id) {
         Product product = null ;
-        // LẤY 
         String sql = "select * from products where id = ?";
         try {
             ResultSet resultSet = JdbcUtil.executeQuery(sql, id);
             while (resultSet.next()) {
-            
                 String name = resultSet.getString("name");
                 int quantity = resultSet.getInt("quantity");
                 int price = resultSet.getInt("price");
-                int categoryId = resultSet.getInt("category_id");
+                
+                // Đã sửa category_id thành categoryID
+                int categoryId = resultSet.getInt("categoryID"); 
                 String image = resultSet.getString("image");
 
                 product  = new Product(id, name, quantity, price, image, categoryId);
-               
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return product;
     }
-    
-
 }
