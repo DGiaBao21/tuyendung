@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head('Danh Sách Công Ty')}"></head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments :: navbar('companies')}"></nav>
+
+    <!-- ═══ PAGE HEADER ═══ -->
+    <section class="page-header" id="companiesHeader">
+        <div class="container">
+            <h1 class="page-header-title">
+                <i class="fa-solid fa-building me-2"></i> Công Ty Tuyển Dụng
+            </h1>
+            <p class="page-header-subtitle">Các doanh nghiệp đang tuyển dụng tại Đồng bằng sông Cửu Long</p>
+        </div>
+    </section>
+
+    <!-- ═══ COMPANY GRID ═══ -->
+    <section class="section-container" id="companyGrid">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-3" th:each="company : ${companies}">
+                    <a th:href="@{/company/{id}(id=${company.id})}" style="text-decoration: none;">
+                        <div class="company-card fade-in-up">
+                            <div class="company-card-logo"
+                                th:text="${company.companyName != null ? company.companyName.substring(0,1) : 'C'}">
+                                C
+                            </div>
+                            <div class="company-card-name" th:text="${company.companyName}">Tên Công Ty</div>
+                            <div class="company-card-address">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span th:text="${company.address != null ? company.address : 'Đang cập nhật'}">Cần Thơ</span>
+                            </div>
+                            <div class="company-card-jobs">
+                                <i class="fa-solid fa-briefcase"></i> Xem việc làm
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(companies)}" class="text-center py-5">
+                <i class="fa-solid fa-building text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3 fs-5">Chưa có công ty nào được đăng ký.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+
+</html>

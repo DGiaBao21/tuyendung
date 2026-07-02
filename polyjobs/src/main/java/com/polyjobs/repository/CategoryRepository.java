@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.polyjobs.entity.Category;
-import com.polyjobs.entity.Job;
+
 
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Integer> {

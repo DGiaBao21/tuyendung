@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head(${job.title})}"></head>
+
+<body>
+
+    <!-- Navbar (from fragment) -->
+    <nav th:replace="~{fragments :: navbar('jobs')}"></nav>
+
+    <!-- ═══ BREADCRUMB ═══ -->
+    <div class="breadcrumb-section" id="breadcrumb">
+        <div class="container">
+            <ul class="breadcrumb-polyjobs">
+                <li><a th:href="@{/}"><i class="fa-solid fa-house me-1"></i> Trang chủ</a></li>
+                <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                <li><a th:href="@{/jobs}">Việc làm</a></li>
+                <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                <li th:text="${job.title}">Tên công việc</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="container" style="padding-top: 28px; padding-bottom: 60px;">
+        <div class="row g-4">
+
+            <!-- ── Left Column ── -->
+            <div class="col-lg-8">
+
+                <!-- Job Header -->
+                <div class="job-detail-header" id="jobHeader">
+                    <div class="job-detail-top">
+                        <div class="detail-company-logo"
+                            th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
+                            C
+                        </div>
+                        <div>
+                            <h1 class="job-detail-title" th:text="${job.title}">Tên Công Việc</h1>
+                            <a th:if="${job.company != null}" th:href="@{/company/{id}(id=${job.company.id})}"
+                                class="job-detail-company" style="text-decoration: none;"
+                                th:text="${job.company.companyName}">Tên công ty</a>
+                            <div th:if="${job.company == null}" class="job-detail-company">Đang cập nhật công ty...</div>
+                        </div>
+                    </div>
+                    <div class="job-detail-pills mt-3">
+                        <div class="detail-pill salary">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">Thỏa thuận</span>
+                        </div>
+                        <div class="detail-pill location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span th:text="${job.location != null ? job.location : 'Đang cập nhật'}">Cần Thơ</span>
+                        </div>
+                        <div class="detail-pill work-type">
+                            <i class="fa-solid fa-clock"></i>
+                            <span th:text="${job.workingType != null ? job.workingType : 'Toàn thời gian'}">Toàn thời gian</span>
+                        </div>
+                        <div class="detail-pill experience" th:if="${job.experience != null}">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span th:text="${job.experience}">1 năm</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Description -->
+                <div class="job-detail-body" id="jobDescription">
+                    <div class="mb-4">
+                        <h2 class="detail-section-title">
+                            <i class="fa-solid fa-file-lines"></i> Mô Tả Công Việc
+                        </h2>
+                        <div class="detail-content" th:text="${job.description}">Chi tiết mô tả công việc...</div>
+                    </div>
+
+                    <div th:if="${job.benefit != null}">
+                        <h2 class="detail-section-title">
+                            <i class="fa-solid fa-gift"></i> Quyền Lợi Được Hưởng
+                        </h2>
+                        <div class="detail-content" th:text="${job.benefit}">Chi tiết quyền lợi...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Right Column - Sidebar ── -->
+            <div class="col-lg-4">
+                <div class="sticky-sidebar">
+
+                    <!-- Apply Card -->
+                    <div class="sidebar-card apply-card" id="applyCard">
+                        <div class="text-center mb-3">
+                            <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 6px;">Hạn nộp hồ sơ</p>
+                            <h4 style="color: var(--salary-color); font-weight: 700; margin-bottom: 0;"
+                                th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</h4>
+                        </div>
+                        <a href="#" class="btn-apply" id="btnApply">
+                            <i class="fa-solid fa-paper-plane me-2"></i> ỨNG TUYỂN NGAY
+                        </a>
+                        <button class="btn-save" id="btnSave">
+                            <i class="fa-regular fa-heart me-1"></i> Lưu tin tuyển dụng
+                        </button>
+                    </div>
+
+                    <!-- General Info Card -->
+                    <div class="sidebar-card" id="generalInfo">
+                        <h5 style="font-weight: 700; margin-bottom: 4px; font-size: 1.05rem;">Thông Tin Chung</h5>
+                        <ul class="sidebar-info-list">
+                            <li class="sidebar-info-item">
+                                <div class="sidebar-info-icon">
+                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                </div>
+                                <div>
+                                    <div class="sidebar-info-label">Mức lương</div>
+                                    <div class="sidebar-info-value" th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">Thỏa thuận</div>
+                                </div>
+                            </li>
+                            <li class="sidebar-info-item">
+                                <div class="sidebar-info-icon">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <div class="sidebar-info-label">Địa điểm</div>
+                                    <div class="sidebar-info-value" th:text="${job.location != null ? job.location : 'Đang cập nhật'}">Cần Thơ</div>
+                                </div>
+                            </li>
+                            <li class="sidebar-info-item">
+                                <div class="sidebar-info-icon">
+                                    <i class="fa-solid fa-briefcase"></i>
+                                </div>
+                                <div>
+                                    <div class="sidebar-info-label">Kinh nghiệm</div>
+                                    <div class="sidebar-info-value" th:text="${job.experience != null ? job.experience : 'Không yêu cầu'}">1 năm</div>
+                                </div>
+                            </li>
+                            <li class="sidebar-info-item">
+                                <div class="sidebar-info-icon">
+                                    <i class="fa-solid fa-clock"></i>
+                                </div>
+                                <div>
+                                    <div class="sidebar-info-label">Hình thức</div>
+                                    <div class="sidebar-info-value" th:text="${job.workingType != null ? job.workingType : 'Toàn thời gian'}">Toàn thời gian</div>
+                                </div>
+                            </li>
+                            <li class="sidebar-info-item">
+                                <div class="sidebar-info-icon">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div>
+                                    <div class="sidebar-info-label">Số lượng tuyển</div>
+                                    <div class="sidebar-info-value"><span th:text="${job.quantity}">1</span> người</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Company Info Card -->
+                    <div class="sidebar-card" id="companyInfo" th:if="${job.company != null}">
+                        <h5 style="font-weight: 700; margin-bottom: 16px; font-size: 1.05rem;">Thông Tin Công Ty</h5>
+                        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
+                            <div class="detail-company-logo" style="width: 50px; height: 50px; font-size: 20px;"
+                                th:text="${job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
+                                C
+                            </div>
+                            <div>
+                                <a th:href="@{/company/{id}(id=${job.company.id})}"
+                                    style="font-weight: 700; color: var(--text-primary); text-decoration: none;"
+                                    th:text="${job.company.companyName}">Tên công ty</a>
+                                <br>
+                                <a th:if="${job.company.website != null}" th:href="${job.company.website}"
+                                    target="_blank"
+                                    style="font-size: 0.82rem; color: var(--primary);">
+                                    <i class="fa-solid fa-globe me-1"></i> Website
+                                </a>
+                            </div>
+                        </div>
+                        <div th:if="${job.company.address != null}"
+                            style="font-size: 0.88rem; color: var(--text-secondary); display: flex; gap: 8px; align-items: flex-start; margin-bottom: 14px;">
+                            <i class="fa-solid fa-map-marker-alt mt-1" style="color: var(--primary); flex-shrink: 0;"></i>
+                            <span th:text="${job.company.address}">Địa chỉ công ty</span>
+                        </div>
+                        <a th:href="@{/company/{id}(id=${job.company.id})}" class="btn-view-detail"
+                            style="width: 100%; text-align: center; display: block;">
+                            Xem trang công ty <i class="fa-solid fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer (from fragment) -->
+    <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Scripts (from fragment) -->
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+
+</html>

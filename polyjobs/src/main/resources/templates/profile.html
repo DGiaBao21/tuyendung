@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Trang cá nhân')}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('profile')}"></nav>
+
+    <div class="container py-5">
+        <div class="row">
+            <!-- Alert Messages -->
+            <div class="col-12 mb-3">
+                <div class="alert alert-polyjobs alert-success" th:if="${success}">
+                    <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
+                </div>
+                <div class="alert alert-polyjobs alert-danger" th:if="${error}">
+                    <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
+                </div>
+            </div>
+
+            <!-- Avatar & Overview -->
+            <div class="col-md-4 mb-4">
+                <div class="card p-4 text-center">
+                    <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" class="rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    <form action="/profile/upload-avatar" method="post" enctype="multipart/form-data" class="mb-3">
+                        <input type="file" name="avatarFile" id="avatarFile" accept="image/*" class="d-none" onchange="this.form.submit()">
+                        <label for="avatarFile" class="btn btn-sm btn-outline-primary" style="cursor: pointer;"><i class="fa-solid fa-camera"></i> Đổi ảnh</label>
+                    </form>
+                    <h4 th:text="${user.fullname}">Họ tên</h4>
+                    <p class="text-muted" th:text="${user.email}">email@example.com</p>
+                    <span class="badge bg-primary" th:if="${user.role}">Nhà tuyển dụng</span>
+                    <span class="badge bg-secondary" th:unless="${user.role}">Ứng viên</span>
+                </div>
+            </div>
+
+            <!-- Profile details -->
+            <div class="col-md-8">
+                <div class="card p-4 mb-4 fade-in-up">
+                    <h5 class="mb-4">Thông tin cá nhân</h5>
+                    <form action="/profile/update" method="post">
+                        <div class="mb-3">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input type="text" class="form-control" th:value="${user.username}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Họ và tên</label>
+                            <input type="text" class="form-control" name="fullname" th:value="${user.fullname}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-control" th:value="${user.email}" disabled>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="text" class="form-control" name="phone" th:value="${user.phone}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <input type="text" class="form-control" name="address" th:value="${user.address}">
+                        </div>
+                        <div class="mb-3" th:if="${!user.role}">
+                            <label class="form-label">Ngành nghề / Chuyên ngành</label>
+                            <input type="text" class="form-control" name="profession" th:value="${user.profession}" placeholder="Ví dụ: IT, Thiết kế đồ họa, Kế toán...">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background: var(--gradient-primary); border: none;">Lưu thay đổi</button>
+                    </form>
+                </div>
+
+                <!-- Resume Upload Section (Only for Candidate) -->
+                <div class="card p-4 fade-in-up" th:if="${!user.role}">
+                    <h5 class="mb-4">Hồ sơ xin việc (CV)</h5>
+                    <form action="/profile/upload-cv" method="post" enctype="multipart/form-data" class="mb-4">
+                        <div class="mb-3">
+                            <label for="cvFile" class="form-label">Tải lên CV mới (PDF, Docx)</label>
+                            <div class="input-group">
+                                <input class="form-control" type="file" id="cvFile" name="cvFile" accept=".pdf,.doc,.docx" required>
+                                <button type="submit" class="btn btn-success"><i class="fa-solid fa-upload me-2"></i> Tải lên</button>
+                            </div>
+                            <small class="text-muted">Tối đa 5MB.</small>
+                        </div>
+                    </form>
+
+                    <h6>CV đã tải lên</h6>
+                    <div class="table-responsive" th:if="${resumes != null and !resumes.isEmpty()}">
+                        <table class="table table-hover align-middle border">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Tên file</th>
+                                    <th>Ngày tải lên</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="cv : ${resumes}">
+                                    <td>
+                                        <i class="fa-solid fa-file-pdf text-danger me-2" th:if="${cv.title.endsWith('.pdf')}"></i>
+                                        <i class="fa-solid fa-file-word text-primary me-2" th:unless="${cv.title.endsWith('.pdf')}"></i>
+                                        <span th:text="${cv.title}">CV.pdf</span>
+                                    </td>
+                                    <td th:text="${#dates.format(cv.uploadDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
+                                    <td>
+                                        <a th:href="@{${cv.fileName}}" target="_blank" class="btn btn-sm btn-outline-primary">Tải về / Xem</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Xem trước CV gần nhất (PDF) -->
+                    <div th:if="${resumes != null and !resumes.isEmpty() and resumes[0].title.toLowerCase().endsWith('.pdf')}" class="mt-4">
+                        <hr class="mb-4">
+                        <h6>Xem trước CV gần nhất</h6>
+                        <div class="border rounded overflow-hidden shadow-sm" style="height: 600px;">
+                            <iframe th:src="@{${resumes[0].fileName}}" width="100%" height="100%" style="border: none;"></iframe>
+                        </div>
+                    </div>
+
+                    <div th:if="${resumes == null or resumes.isEmpty()}" class="alert alert-light border text-center text-muted">
+                        <i class="fa-solid fa-file-invoice mb-2 fs-3"></i><br>
+                        Bạn chưa tải lên hồ sơ nào.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

@@ -1,41 +1,241 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <title>PolyJobs - Cổng thông tin việc làm</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
+<head th:replace="~{fragments :: head('Tuyển Dụng Việc Làm Miền Tây Nam Bộ')}"></head>
 
 <body>
-    <div class="container mt-5">
-        <h1 class="text-primary mb-4">Danh sách Việc làm mới nhất</h1>
 
-        <table class="table table-bordered table-hover">
-            <thead class="table-dark">
-                <tr>
-                    <th>ID</th>
-                    <th>Tiêu đề công việc</th>
-                    <th>Mức lương</th>
-                    <th>Kinh nghiệm</th>
-                    <th>Địa điểm</th>
-                    <th>Hành động</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="job : ${jobs}">
-                    <td th:text="${job.id}">1</td>
-                    <td class="fw-bold" th:text="${job.title}">Lập trình viên Java</td>
-                    <td class="text-danger" th:text="${job.salary}">10 - 15 Triệu</td>
-                    <td th:text="${job.experience}">1 năm</td>
-                    <td th:text="${job.location}">Cần Thơ</td>
-                    <td>
-                        <button class="btn btn-sm btn-success">Ứng tuyển ngay</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <!-- Navbar (from fragment) -->
+    <nav th:replace="~{fragments :: navbar('home')}"></nav>
+
+    <!-- ═══ HERO SECTION ═══ -->
+    <section class="hero-section" id="hero">
+        <div class="hero-decoration">
+            <div class="hero-dot"></div>
+            <div class="hero-dot"></div>
+            <div class="hero-dot"></div>
+            <div class="hero-dot"></div>
+            <div class="hero-dot"></div>
+            <div class="hero-dot"></div>
+        </div>
+        <div class="container">
+            <div class="hero-content text-center text-md-start">
+                <h1 class="hero-title">Cơ Hội Việc Làm<br><span>Miền Tây Nam Bộ</span></h1>
+                <p class="hero-subtitle mx-auto mx-md-0">
+                    Kết nối nhân tài với doanh nghiệp 13 tỉnh Đồng bằng sông Cửu Long.
+                    Tìm kiếm công việc mơ ước ngay hôm nay!
+                </p>
+
+                <!-- Search Box -->
+                <form class="search-box mx-auto mx-md-0" th:action="@{/jobs}" method="get" id="searchForm">
+                    <div class="d-flex flex-column flex-md-row gap-2">
+                        <input type="text" class="form-control" name="keyword"
+                            placeholder="Tên công việc, vị trí, công ty..." id="searchKeyword">
+                        <select class="form-select" name="location" id="searchLocation">
+                            <option value="">Tất cả tỉnh thành</option>
+                            <option value="An Giang">An Giang</option>
+                            <option value="Bạc Liêu">Bạc Liêu</option>
+                            <option value="Bến Tre">Bến Tre</option>
+                            <option value="Cà Mau">Cà Mau</option>
+                            <option value="Cần Thơ">Cần Thơ</option>
+                            <option value="Đồng Tháp">Đồng Tháp</option>
+                            <option value="Hậu Giang">Hậu Giang</option>
+                            <option value="Kiên Giang">Kiên Giang</option>
+                            <option value="Long An">Long An</option>
+                            <option value="Sóc Trăng">Sóc Trăng</option>
+                            <option value="Tiền Giang">Tiền Giang</option>
+                            <option value="Trà Vinh">Trà Vinh</option>
+                            <option value="Vĩnh Long">Vĩnh Long</option>
+                        </select>
+                        <button class="btn btn-search" type="submit" id="btnSearch">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> TÌM KIẾM
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Stats -->
+                <div class="hero-stats justify-content-center justify-content-md-start">
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalJobs != null ? totalJobs : '500+'}">500+</div>
+                        <div class="stat-label">Việc làm mới</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number" th:text="${totalCompanies != null ? totalCompanies : '200+'}">200+</div>
+                        <div class="stat-label">Công ty</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">13</div>
+                        <div class="stat-label">Tỉnh thành</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ NGÀNH NGHỀ PHỔ BIẾN ═══ -->
+    <section class="section-container" id="categories">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Ngành Nghề Phổ Biến</h2>
+                <p class="section-subtitle">Khám phá cơ hội việc làm theo ngành nghề tại miền Tây</p>
+            </div>
+            <div class="category-grid">
+                <a th:href="@{/jobs(keyword='IT')}" class="category-card fade-in-up" id="cat-tech" style="text-decoration:none;">
+                    <div class="category-icon tech">
+                        <i class="fa-solid fa-laptop-code"></i>
+                    </div>
+                    <div class="category-name">Công nghệ thông tin</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Kinh doanh')}" class="category-card fade-in-up" id="cat-business" style="text-decoration:none;">
+                    <div class="category-icon business">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="category-name">Kinh doanh</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Thủy sản')}" class="category-card fade-in-up" id="cat-seafood" style="text-decoration:none;">
+                    <div class="category-icon seafood">
+                        <i class="fa-solid fa-fish"></i>
+                    </div>
+                    <div class="category-name">Chế biến Thủy sản</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Nông nghiệp')}" class="category-card fade-in-up" id="cat-agriculture" style="text-decoration:none;">
+                    <div class="category-icon agriculture">
+                        <i class="fa-solid fa-seedling"></i>
+                    </div>
+                    <div class="category-name">Nông nghiệp</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Du lịch')}" class="category-card fade-in-up" id="cat-tourism" style="text-decoration:none;">
+                    <div class="category-icon tourism">
+                        <i class="fa-solid fa-umbrella-beach"></i>
+                    </div>
+                    <div class="category-name">Du lịch - Nhà hàng</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Giáo dục')}" class="category-card fade-in-up" id="cat-education" style="text-decoration:none;">
+                    <div class="category-icon education">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                    </div>
+                    <div class="category-name">Giáo dục - Đào tạo</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Y tế')}" class="category-card fade-in-up" id="cat-health" style="text-decoration:none;">
+                    <div class="category-icon health">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div class="category-name">Y tế - Sức khỏe</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+                <a th:href="@{/jobs(keyword='Xây dựng')}" class="category-card fade-in-up" id="cat-construction" style="text-decoration:none;">
+                    <div class="category-icon construction">
+                        <i class="fa-solid fa-helmet-safety"></i>
+                    </div>
+                    <div class="category-name">Xây dựng</div>
+                    <div class="category-count">Nhiều vị trí</div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ VIỆC LÀM MỚI NHẤT ═══ -->
+    <section class="section-container" style="background: var(--primary-50); padding-top: 50px; padding-bottom: 60px;" id="latestJobs">
+        <div class="container">
+            <div class="section-header d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h2 class="section-title">Việc Làm Mới Nhất</h2>
+                    <p class="section-subtitle">Các cơ hội việc làm nổi bật tại Đồng bằng sông Cửu Long</p>
+                </div>
+                <a th:href="@{/jobs}" class="btn-view-detail" style="margin-top: 10px;">
+                    Xem tất cả <i class="fa-solid fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+                    <div class="job-card fade-in-up">
+                        <div class="job-card-header">
+                            <div class="company-logo-placeholder"
+                                th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
+                                C
+                            </div>
+                            <div class="job-card-info">
+                                <a th:href="@{/job/{id}(id=${job.id})}">
+                                    <div class="job-title" th:text="${job.title}">Lập trình viên Java</div>
+                                </a>
+                                <a th:href="@{/company/{id}(id=${job.company.id})}" th:if="${job.company != null}"
+                                    class="job-company" style="text-decoration: none;"
+                                    th:text="${job.company.companyName}">Công ty ABC</a>
+                                <div class="job-company" th:if="${job.company == null}">Đang cập nhật</div>
+                            </div>
+                        </div>
+
+                        <div class="job-salary">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">15 - 20 Triệu</span>
+                        </div>
+
+                        <div class="job-tags">
+                            <span class="job-tag location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span th:text="${job.location}">Cần Thơ</span>
+                            </span>
+                            <span class="job-tag experience" th:if="${job.experience != null}">
+                                <i class="fa-solid fa-briefcase"></i>
+                                <span th:text="${job.experience}">1 năm</span>
+                            </span>
+                            <span class="job-tag work-type" th:if="${job.workingType != null}">
+                                <i class="fa-solid fa-clock"></i>
+                                <span th:text="${job.workingType}">Toàn thời gian</span>
+                            </span>
+                        </div>
+
+                        <p class="job-description-preview" th:text="${job.description}">
+                            Yêu cầu có kinh nghiệm làm việc với Java Core, Spring Boot, SQL Server...
+                        </p>
+
+                        <div class="job-card-footer">
+                            <span class="job-deadline">
+                                <i class="fa-regular fa-calendar"></i>
+                                Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</span>
+                            </span>
+                            <a th:href="@{/job/{id}(id=${job.id})}" class="btn-view-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(jobs)}" class="text-center py-5">
+                <i class="fa-solid fa-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3 fs-5">Chưa có việc làm nào. Hãy quay lại sau nhé!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ BANNER CTA ═══ -->
+    <section style="background: var(--gradient-primary); padding: 60px 0;" id="ctaBanner">
+        <div class="container text-center">
+            <h2 style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-bottom: 12px;">
+                Bạn là nhà tuyển dụng?
+            </h2>
+            <p style="color: rgba(255,255,255,0.8); font-size: 1.05rem; margin-bottom: 28px; max-width: 500px; margin-left: auto; margin-right: auto;">
+                Đăng tin tuyển dụng miễn phí, tiếp cận hàng ngàn ứng viên chất lượng tại miền Tây Nam Bộ
+            </p>
+            <a th:href="@{/register(role='employer')}" class="btn btn-light px-4 py-2 fw-bold" style="border-radius: 8px; font-size: 1rem;"
+                id="btnPostJob">
+                <i class="fa-solid fa-plus me-2"></i>Đăng Tin Ngay
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer (from fragment) -->
+    <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Scripts (from fragment) -->
+    <div th:replace="~{fragments :: scripts}"></div>
 </body>
 
 </html>

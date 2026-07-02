@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head('Tìm Việc Làm Miền Tây')}"></head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments :: navbar('jobs')}"></nav>
+
+    <!-- ═══ PAGE HEADER + SEARCH ═══ -->
+    <section class="page-header" id="jobsHeader">
+        <div class="container">
+            <h1 class="page-header-title">
+                <i class="fa-solid fa-magnifying-glass me-2"></i> Tìm Việc Làm
+            </h1>
+            <p class="page-header-subtitle">Khám phá cơ hội nghề nghiệp tại 13 tỉnh Đồng bằng sông Cửu Long</p>
+
+            <!-- Search Filter Bar -->
+            <form class="search-filter-bar" action="/jobs" method="get" id="searchFilterForm">
+                <div class="d-flex flex-column flex-md-row gap-2">
+                    <input type="text" class="form-control" name="keyword"
+                        placeholder="Tên công việc, vị trí, công ty..."
+                        th:value="${keyword}" id="searchKeyword">
+                    <select class="form-select" name="location" id="searchLocation" style="max-width: 250px;">
+                        <option value="">Tất cả tỉnh thành</option>
+                        <option value="An Giang" th:selected="${location == 'An Giang'}">An Giang</option>
+                        <option value="Bạc Liêu" th:selected="${location == 'Bạc Liêu'}">Bạc Liêu</option>
+                        <option value="Bến Tre" th:selected="${location == 'Bến Tre'}">Bến Tre</option>
+                        <option value="Cà Mau" th:selected="${location == 'Cà Mau'}">Cà Mau</option>
+                        <option value="Cần Thơ" th:selected="${location == 'Cần Thơ'}">Cần Thơ</option>
+                        <option value="Đồng Tháp" th:selected="${location == 'Đồng Tháp'}">Đồng Tháp</option>
+                        <option value="Hậu Giang" th:selected="${location == 'Hậu Giang'}">Hậu Giang</option>
+                        <option value="Kiên Giang" th:selected="${location == 'Kiên Giang'}">Kiên Giang</option>
+                        <option value="Long An" th:selected="${location == 'Long An'}">Long An</option>
+                        <option value="Sóc Trăng" th:selected="${location == 'Sóc Trăng'}">Sóc Trăng</option>
+                        <option value="Tiền Giang" th:selected="${location == 'Tiền Giang'}">Tiền Giang</option>
+                        <option value="Trà Vinh" th:selected="${location == 'Trà Vinh'}">Trà Vinh</option>
+                        <option value="Vĩnh Long" th:selected="${location == 'Vĩnh Long'}">Vĩnh Long</option>
+                    </select>
+                    <button class="btn btn-search" type="submit" style="white-space: nowrap;">
+                        <i class="fa-solid fa-magnifying-glass me-1"></i> TÌM KIẾM
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- ═══ JOB RESULTS ═══ -->
+    <section class="section-container" id="jobResults">
+        <div class="container">
+
+            <!-- Search Results Info -->
+            <div class="search-results-info" th:if="${totalResults != null}">
+                <i class="fa-solid fa-list me-1"></i>
+                Tìm thấy <strong th:text="${totalResults}">0</strong> việc làm
+                <span th:if="${keyword != null && !keyword.isEmpty()}">
+                    cho "<strong th:text="${keyword}">keyword</strong>"
+                </span>
+                <span th:if="${location != null && !location.isEmpty()}">
+                    tại <strong th:text="${location}">location</strong>
+                </span>
+            </div>
+
+            <!-- Job Cards Grid -->
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+                    <div class="job-card fade-in-up">
+                        <div class="job-card-header">
+                            <div class="company-logo-placeholder"
+                                th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
+                                C
+                            </div>
+                            <div class="job-card-info">
+                                <a th:href="@{/job/{id}(id=${job.id})}">
+                                    <div class="job-title" th:text="${job.title}">Lập trình viên Java</div>
+                                </a>
+                                <div class="job-company"
+                                    th:text="${job.company != null ? job.company.companyName : 'Đang cập nhật'}">
+                                    Công ty ABC</div>
+                            </div>
+                        </div>
+
+                        <div class="job-salary">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                            <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">15 - 20 Triệu</span>
+                        </div>
+
+                        <div class="job-tags">
+                            <span class="job-tag location">
+                                <i class="fa-solid fa-location-dot"></i>
+                                <span th:text="${job.location}">Cần Thơ</span>
+                            </span>
+                            <span class="job-tag experience" th:if="${job.experience != null}">
+                                <i class="fa-solid fa-briefcase"></i>
+                                <span th:text="${job.experience}">1 năm</span>
+                            </span>
+                            <span class="job-tag work-type" th:if="${job.workingType != null}">
+                                <i class="fa-solid fa-clock"></i>
+                                <span th:text="${job.workingType}">Toàn thời gian</span>
+                            </span>
+                        </div>
+
+                        <p class="job-description-preview" th:text="${job.description}">
+                            Mô tả công việc...
+                        </p>
+
+                        <div class="job-card-footer">
+                            <span class="job-deadline">
+                                <i class="fa-regular fa-calendar"></i>
+                                Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</span>
+                            </span>
+                            <a th:href="@{/job/{id}(id=${job.id})}" class="btn-view-detail">Xem chi tiết</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty state -->
+            <div th:if="${#lists.isEmpty(jobs)}" class="text-center py-5">
+                <i class="fa-solid fa-search text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-3 fs-5">Không tìm thấy việc làm phù hợp.</p>
+                <a th:href="@{/jobs}" class="btn btn-outline-primary mt-2">Xem tất cả việc làm</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+
+</html>

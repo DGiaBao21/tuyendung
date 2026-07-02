@@ -27,6 +27,7 @@ public class User {
     private String phone;
     private String address;
     private String avatar;
+    private String profession; // Ngành nghề / Chuyên ngành
 
     // 0: Candidate | 1: Employer/Admin
     private Boolean role = false;

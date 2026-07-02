@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Ứng viên')}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('candidates')}"></nav>
+
+    <!-- Header Section -->
+    <section class="py-5" style="background: var(--gradient-primary); color: #fff;">
+        <div class="container text-center fade-in-up">
+            <h1 class="display-5 fw-bold mb-3">Tìm kiếm ứng viên tiềm năng</h1>
+            <p class="lead mb-4">Kết nối với những tài năng hàng đầu trong mọi lĩnh vực</p>
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <form action="/candidates" method="get" class="d-flex">
+                        <div class="input-group input-group-lg shadow-sm">
+                            <input type="text" class="form-control border-0" name="profession" th:value="${keyword}" placeholder="Nhập ngành nghề, chuyên ngành...">
+                            <button type="submit" class="btn btn-light text-primary fw-bold px-4">
+                                <i class="fa-solid fa-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row g-4">
+            <!-- Candidate Card -->
+            <div class="col-md-6 col-lg-4" th:each="candidate : ${candidates}">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center p-4">
+                        <img th:src="${candidate.avatar != null ? candidate.avatar : 'https://ui-avatars.com/api/?name=' + candidate.fullname + '&background=random'}" 
+                             class="rounded-circle mb-3 border shadow-sm" style="width: 100px; height: 100px; object-fit: cover;">
+                        
+                        <h5 class="card-title fw-bold mb-1" th:text="${candidate.fullname}">Tên Ứng Viên</h5>
+                        <p class="text-muted mb-2"><i class="fa-solid fa-briefcase me-1"></i> <span th:text="${candidate.profession != null and !candidate.profession.isEmpty() ? candidate.profession : 'Chưa cập nhật ngành nghề'}">Ngành nghề</span></p>
+                        
+                        <ul class="list-unstyled text-start text-muted small bg-light p-3 rounded mb-3">
+                            <li class="mb-1"><i class="fa-solid fa-envelope text-primary me-2"></i><span th:text="${candidate.email}">email@example.com</span></li>
+                            <li class="mb-1" th:if="${candidate.phone != null and !candidate.phone.isEmpty()}"><i class="fa-solid fa-phone text-primary me-2"></i><span th:text="${candidate.phone}">0123456789</span></li>
+                            <li th:if="${candidate.address != null and !candidate.address.isEmpty()}"><i class="fa-solid fa-location-dot text-primary me-2"></i><span th:text="${candidate.address}">Địa chỉ</span></li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 pb-4 text-center">
+                        <div th:if="${candidateCvMap.containsKey(candidate.id)}">
+                            <button type="button" class="btn btn-outline-primary w-100 rounded-pill" data-bs-toggle="modal" th:data-bs-target="'#modal-cv-' + ${candidate.id}">
+                                <i class="fa-solid fa-file-pdf me-2"></i> Xem CV / Hồ sơ
+                            </button>
+                        </div>
+                        <div th:unless="${candidateCvMap.containsKey(candidate.id)}">
+                            <button class="btn btn-light text-muted w-100 rounded-pill disabled">
+                                <i class="fa-solid fa-xmark me-2"></i> Chưa có CV
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal for viewing Candidate profile & CV -->
+                <div th:if="${candidateCvMap.containsKey(candidate.id)}" class="modal fade" th:id="'modal-cv-' + ${candidate.id}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                        <div class="modal-content">
+                            <div class="modal-header border-0 pb-0">
+                                <h5 class="modal-title fw-bold">Hồ sơ ứng viên</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <div class="row g-4">
+                                    <!-- Candidate Info -->
+                                    <div class="col-lg-4">
+                                        <div class="text-center mb-4">
+                                            <img th:src="${candidate.avatar != null ? candidate.avatar : 'https://ui-avatars.com/api/?name=' + candidate.fullname + '&background=random'}" 
+                                                 class="rounded-circle mb-3 border shadow-sm" style="width: 150px; height: 150px; object-fit: cover;">
+                                            <h4 class="fw-bold mb-1" th:text="${candidate.fullname}"></h4>
+                                            <span class="badge bg-primary mb-3" th:text="${candidate.profession != null and !candidate.profession.isEmpty() ? candidate.profession : 'Chưa cập nhật ngành nghề'}"></span>
+                                        </div>
+                                        <div class="bg-light p-4 rounded shadow-sm text-start">
+                                            <h6 class="fw-bold mb-3 border-bottom pb-2">Thông tin liên hệ</h6>
+                                            <p class="mb-2"><i class="fa-solid fa-envelope text-primary me-2"></i><span th:text="${candidate.email}"></span></p>
+                                            <p class="mb-2" th:if="${candidate.phone != null and !candidate.phone.isEmpty()}"><i class="fa-solid fa-phone text-primary me-2"></i><span th:text="${candidate.phone}"></span></p>
+                                            <p class="mb-0" th:if="${candidate.address != null and !candidate.address.isEmpty()}"><i class="fa-solid fa-location-dot text-primary me-2"></i><span th:text="${candidate.address}"></span></p>
+                                        </div>
+                                    </div>
+                                    <!-- CV Iframe -->
+                                    <div class="col-lg-8">
+                                        <div class="border rounded overflow-hidden shadow-sm h-100" style="min-height: 600px;">
+                                            <iframe th:if="${candidateCvMap.get(candidate.id).title.toLowerCase().endsWith('.pdf')}" th:src="@{${candidateCvMap.get(candidate.id).fileName}}" width="100%" height="100%" style="border: none; min-height: 600px;"></iframe>
+                                            <div th:unless="${candidateCvMap.get(candidate.id).title.toLowerCase().endsWith('.pdf')}" class="d-flex align-items-center justify-content-center h-100 p-5 text-center bg-light" style="min-height: 600px;">
+                                                <div>
+                                                    <i class="fa-solid fa-file-word text-primary mb-3" style="font-size: 4rem;"></i>
+                                                    <h5>File CV không phải định dạng PDF</h5>
+                                                    <p class="text-muted">Trình duyệt không hỗ trợ xem trước định dạng này.</p>
+                                                    <a th:href="@{${candidateCvMap.get(candidate.id).fileName}}" target="_blank" class="btn btn-primary mt-2"><i class="fa-solid fa-download me-2"></i>Tải file về máy</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-12" th:if="${candidates.isEmpty()}">
+                <div class="alert alert-light border text-center p-5">
+                    <i class="fa-solid fa-user-slash text-muted fs-1 mb-3"></i>
+                    <h4>Không tìm thấy ứng viên nào</h4>
+                    <p class="text-muted">Hãy thử tìm kiếm với từ khóa khác.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

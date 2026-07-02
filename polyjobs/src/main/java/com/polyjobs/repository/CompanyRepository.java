@@ -3,11 +3,10 @@ package com.polyjobs.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.polyjobs.entity.Category;
-import com.polyjobs.entity.Job;
+import com.polyjobs.entity.Company;
 
 @Repository
-public interface CompanyRepository extends JpaRepository<Category, Integer> {
+public interface CompanyRepository extends JpaRepository<Company, Integer> {
     // Không cần viết code gì bên trong. Spring đã tự làm sẵn các hàm findAll(),
     // findById(), save(), delete()...
 }

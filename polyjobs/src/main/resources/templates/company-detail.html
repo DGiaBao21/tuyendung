@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments :: head(${company.companyName})}"></head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav th:replace="~{fragments :: navbar('companies')}"></nav>
+
+    <!-- ═══ BREADCRUMB ═══ -->
+    <div class="breadcrumb-section">
+        <div class="container">
+            <ul class="breadcrumb-polyjobs">
+                <li><a th:href="@{/}"><i class="fa-solid fa-house me-1"></i> Trang chủ</a></li>
+                <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                <li><a th:href="@{/companies}">Công ty</a></li>
+                <li class="separator"><i class="fa-solid fa-chevron-right"></i></li>
+                <li th:text="${company.companyName}">Tên công ty</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="container" style="padding-top: 28px; padding-bottom: 60px;">
+
+        <!-- Company Header -->
+        <div class="company-detail-header" id="companyHeader">
+            <div class="company-detail-top">
+                <div class="company-detail-logo"
+                    th:text="${company.companyName != null ? company.companyName.substring(0,1) : 'C'}">
+                    C
+                </div>
+                <div>
+                    <h1 class="company-detail-name" th:text="${company.companyName}">Tên Công Ty</h1>
+                    <div class="company-detail-meta">
+                        <div class="company-meta-item" th:if="${company.address != null}">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span th:text="${company.address}">Cần Thơ</span>
+                        </div>
+                        <div class="company-meta-item" th:if="${company.website != null}">
+                            <i class="fa-solid fa-globe"></i>
+                            <a th:href="${company.website}" target="_blank" style="color: var(--primary);"
+                                th:text="${company.website}">website.com</a>
+                        </div>
+                        <div class="company-meta-item">
+                            <i class="fa-solid fa-briefcase"></i>
+                            <span><strong th:text="${companyJobs.size()}">0</strong> việc làm đang tuyển</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Company Description -->
+        <div class="job-detail-body mb-4" th:if="${company.description != null}" id="companyDescription">
+            <h2 class="detail-section-title">
+                <i class="fa-solid fa-building"></i> Giới Thiệu Công Ty
+            </h2>
+            <div class="detail-content" th:text="${company.description}">Mô tả công ty...</div>
+        </div>
+
+        <!-- Company Jobs -->
+        <div class="section-header mt-4">
+            <h2 class="section-title">Việc Làm Đang Tuyển</h2>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4" th:each="job : ${companyJobs}">
+                <div class="job-card fade-in-up">
+                    <div class="job-card-header">
+                        <div class="company-logo-placeholder"
+                            th:text="${company.companyName != null ? company.companyName.substring(0,1) : 'C'}">
+                            C
+                        </div>
+                        <div class="job-card-info">
+                            <a th:href="@{/job/{id}(id=${job.id})}">
+                                <div class="job-title" th:text="${job.title}">Tên công việc</div>
+                            </a>
+                            <div class="job-company" th:text="${company.companyName}">Tên công ty</div>
+                        </div>
+                    </div>
+
+                    <div class="job-salary">
+                        <i class="fa-solid fa-money-bill-wave"></i>
+                        <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">Thỏa thuận</span>
+                    </div>
+
+                    <div class="job-tags">
+                        <span class="job-tag location">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span th:text="${job.location}">Cần Thơ</span>
+                        </span>
+                        <span class="job-tag work-type" th:if="${job.workingType != null}">
+                            <i class="fa-solid fa-clock"></i>
+                            <span th:text="${job.workingType}">Toàn thời gian</span>
+                        </span>
+                    </div>
+
+                    <div class="job-card-footer">
+                        <span class="job-deadline">
+                            <i class="fa-regular fa-calendar"></i>
+                            Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</span>
+                        </span>
+                        <a th:href="@{/job/{id}(id=${job.id})}" class="btn-view-detail">Xem chi tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${#lists.isEmpty(companyJobs)}" class="text-center py-5">
+            <i class="fa-solid fa-inbox text-muted" style="font-size: 3rem;"></i>
+            <p class="text-muted mt-3 fs-5">Công ty hiện chưa có việc làm nào đang tuyển.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Scripts -->
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+
+</html>
