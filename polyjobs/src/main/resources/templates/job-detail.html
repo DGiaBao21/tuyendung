@@ -31,9 +31,9 @@
                 <!-- Job Header -->
                 <div class="job-detail-header" id="jobHeader">
                     <div class="job-detail-top">
-                        <div class="detail-company-logo"
-                            th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
-                            C
+                        <div class="detail-company-logo" style="overflow: hidden; padding: 0;">
+                            <img th:if="${job.company != null and job.company.logo != null}" th:src="${job.company.logo}" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo">
+                            <span th:unless="${job.company != null and job.company.logo != null}" th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">C</span>
                         </div>
                         <div>
                             <h1 class="job-detail-title" th:text="${job.title}">Tên Công Việc</h1>
@@ -92,10 +92,36 @@
                             <h4 style="color: var(--salary-color); font-weight: 700; margin-bottom: 0;"
                                 th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</h4>
                         </div>
-                        <a href="#" class="btn-apply" id="btnApply">
-                            <i class="fa-solid fa-paper-plane me-2"></i> ỨNG TUYỂN NGAY
-                        </a>
-                        <button class="btn-save" id="btnSave">
+                        <div th:if="${session.loggedInUser == null}">
+                            <a th:href="@{/login}" class="btn-apply w-100 mb-2">
+                                <i class="fa-solid fa-right-to-bracket me-2"></i> ĐĂNG NHẬP ĐỂ ỨNG TUYỂN
+                            </a>
+                        </div>
+                        <div th:if="${session.loggedInUser != null and session.loggedInUser.role == false}">
+                            <div th:if="${hasApplied}">
+                                <button class="btn btn-secondary w-100 mb-2 fw-bold" disabled>
+                                    <i class="fa-solid fa-check me-2"></i> ĐÃ ỨNG TUYỂN
+                                </button>
+                            </div>
+                            <div th:unless="${hasApplied}">
+                                <button type="button" class="btn-apply w-100 mb-2" data-bs-toggle="modal" data-bs-target="#applyModal">
+                                    <i class="fa-solid fa-paper-plane me-2"></i> ỨNG TUYỂN NGAY
+                                </button>
+                            </div>
+                        </div>
+                        <div th:if="${session.loggedInUser != null and session.loggedInUser.role == true}">
+                            <button class="btn btn-secondary w-100 mb-2 fw-bold" disabled>
+                                <i class="fa-solid fa-ban me-2"></i> TÀI KHOẢN NTD KHÔNG THỂ ỨNG TUYỂN
+                            </button>
+                        </div>
+                        <form th:action="@{/job/save}" method="post" class="mt-2" th:if="${session.loggedInUser != null and session.loggedInUser.role == false}">
+                            <input type="hidden" name="jobId" th:value="${job.id}" />
+                            <button type="submit" th:class="${isSaved} ? 'btn-save saved w-100' : 'btn-save w-100'">
+                                <i th:class="${isSaved} ? 'fa-solid fa-heart me-1' : 'fa-regular fa-heart me-1'"></i> 
+                                <span th:text="${isSaved} ? 'Bỏ lưu tin này' : 'Lưu tin tuyển dụng'">Lưu tin tuyển dụng</span>
+                            </button>
+                        </form>
+                        <button class="btn-save w-100 mt-2" th:if="${session.loggedInUser == null}" onclick="window.location.href='/login'">
                             <i class="fa-regular fa-heart me-1"></i> Lưu tin tuyển dụng
                         </button>
                     </div>
@@ -156,9 +182,9 @@
                     <div class="sidebar-card" id="companyInfo" th:if="${job.company != null}">
                         <h5 style="font-weight: 700; margin-bottom: 16px; font-size: 1.05rem;">Thông Tin Công Ty</h5>
                         <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 16px;">
-                            <div class="detail-company-logo" style="width: 50px; height: 50px; font-size: 20px;"
-                                th:text="${job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
-                                C
+                            <div class="detail-company-logo" style="width: 50px; height: 50px; font-size: 20px; overflow: hidden; padding: 0;">
+                                <img th:if="${job.company != null and job.company.logo != null}" th:src="${job.company.logo}" style="width: 100%; height: 100%; object-fit: cover;" alt="Logo">
+                                <span th:unless="${job.company != null and job.company.logo != null}" th:text="${job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">C</span>
                             </div>
                             <div>
                                 <a th:href="@{/company/{id}(id=${job.company.id})}"
@@ -191,6 +217,45 @@
 
     <!-- Footer (from fragment) -->
     <footer th:replace="~{fragments :: footer}"></footer>
+
+    <!-- Apply Modal -->
+    <div class="modal fade" id="applyModal" tabindex="-1" aria-labelledby="applyModalLabel" aria-hidden="true" th:if="${session.loggedInUser != null and session.loggedInUser.role == false and !hasApplied}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="applyModalLabel">Ứng tuyển <span class="text-primary" th:text="${job.title}"></span></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/job/apply}" method="post">
+                    <div class="modal-body py-4">
+                        <input type="hidden" name="jobId" th:value="${job.id}" />
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Chọn CV của bạn <span class="text-danger">*</span></label>
+                            <select class="form-select" name="resumeId" required>
+                                <option value="" disabled selected>-- Chọn CV đã tải lên --</option>
+                                <option th:each="cv : ${myResumes}" th:value="${cv.id}" th:text="${cv.fileName + ' (' + #dates.format(cv.uploadDate, 'dd/MM/yyyy') + ')'}"></option>
+                            </select>
+                            <div th:if="${myResumes == null or myResumes.isEmpty()}" class="form-text text-danger mt-2">
+                                Bạn chưa có CV nào. Vui lòng vào <a th:href="@{/profile}">Trang cá nhân</a> để tải lên CV trước.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Thư giới thiệu (Cover Letter)</label>
+                            <textarea class="form-control" name="coverLetter" rows="4" placeholder="Giới thiệu ngắn gọn về bản thân và lý do bạn phù hợp với công việc này..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top-0 pt-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                        <button type="submit" class="btn btn-primary" th:disabled="${myResumes == null or myResumes.isEmpty()}">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Gửi hồ sơ
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <!-- Scripts (from fragment) -->
     <div th:replace="~{fragments :: scripts}"></div>

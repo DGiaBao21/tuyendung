@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Bảng điều khiển')}"></head>
+<body>
+
+<div th:replace="~{admin/fragments :: sidebar('dashboard')}"></div>
+
+<div class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+        <h4 class="admin-m-0 admin-fw-bold">Bảng điều khiển</h4>
+        <div class="admin-flex admin-align-center admin-gap-1">
+            <span class="admin-text-muted">Xin chào, <strong th:text="${session.loggedInUser.fullname}">Admin</strong></span>
+            <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=Admin&background=random'}" 
+                 class="admin-avatar">
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="admin-grid-4">
+        <div class="admin-stat-card admin-bg-primary">
+            <div>
+                <h6>Tổng Người dùng</h6>
+                <h2 th:text="${totalUsers}">0</h2>
+            </div>
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="admin-stat-card admin-bg-success">
+            <div>
+                <h6>Công ty</h6>
+                <h2 th:text="${totalCompanies}">0</h2>
+            </div>
+            <i class="fa-solid fa-building"></i>
+        </div>
+        <div class="admin-stat-card admin-bg-warning">
+            <div>
+                <h6>Việc làm</h6>
+                <h2 th:text="${totalJobs}">0</h2>
+            </div>
+            <i class="fa-solid fa-briefcase"></i>
+        </div>
+        <div class="admin-stat-card admin-bg-danger">
+            <div>
+                <h6>Hồ sơ CV</h6>
+                <h2 th:text="${totalResumes}">0</h2>
+            </div>
+            <i class="fa-solid fa-file-pdf"></i>
+        </div>
+    </div>
+    
+    <div class="admin-alert admin-alert-info mt-4">
+        <i class="fa-solid fa-circle-info"></i> 
+        <span>Chào mừng bạn đến với trang quản trị. Tại đây bạn có thể quản lý người dùng và các tin đăng tuyển dụng.</span>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="admin-card mt-4" style="max-width: 500px; margin: 0 auto;">
+        <h5 class="admin-fw-bold mb-3 text-center">Tỷ lệ Người dùng</h5>
+        <canvas id="userChart"></canvas>
+    </div>
+</div>
+
+<div th:replace="~{admin/fragments :: scripts}"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script th:inline="javascript">
+    const ctx = document.getElementById('userChart').getContext('2d');
+    const totalCandidates = [[${totalCandidates}]];
+    const totalEmployers = [[${totalEmployers}]];
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Ứng viên', 'Nhà tuyển dụng'],
+            datasets: [{
+                data: [totalCandidates, totalEmployers],
+                backgroundColor: ['#0d6efd', '#198754'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+</script>
+</body>
+</html>

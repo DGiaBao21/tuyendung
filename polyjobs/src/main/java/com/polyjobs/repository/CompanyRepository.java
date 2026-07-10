@@ -7,6 +7,5 @@ import com.polyjobs.entity.Company;
 
 @Repository
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
-    // Không cần viết code gì bên trong. Spring đã tự làm sẵn các hàm findAll(),
-    // findById(), save(), delete()...
+    Company findFirstByEmployer(com.polyjobs.entity.User employer);
 }

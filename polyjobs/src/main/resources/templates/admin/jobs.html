@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Quản lý việc làm')}"></head>
+<body>
+
+<div th:replace="~{admin/fragments :: sidebar('jobs')}"></div>
+
+<div class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+        <h4 class="admin-m-0 admin-fw-bold">Quản lý Việc làm</h4>
+        <div class="admin-flex admin-align-center admin-gap-1">
+            <span class="admin-text-muted">Xin chào, <strong th:text="${session.loggedInUser.fullname}">Admin</strong></span>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="admin-alert admin-alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
+    </div>
+
+    <!-- Jobs Table -->
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Mã Job</th>
+                    <th>Tiêu đề</th>
+                    <th>Công ty</th>
+                    <th>Người đăng</th>
+                    <th>Trạng thái</th>
+                    <th class="admin-text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="job : ${jobs}">
+                    <td class="admin-text-muted">#<span th:text="${job.id}"></span></td>
+                    <td>
+                        <h6 class="admin-m-0 admin-fw-bold admin-mb-1"><a th:href="@{/job/{id}(id=${job.id})}" target="_blank" th:text="${job.title}">Tiêu đề</a></h6>
+                        <span class="admin-fs-sm admin-text-muted"><i class="fa-solid fa-clock"></i> <span th:text="${#dates.format(job.createdDate, 'dd/MM/yyyy')}"></span> - Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}"></span></span>
+                    </td>
+                    <td>
+                        <div class="admin-flex admin-align-center admin-gap-1">
+                            <img th:src="${job.company.logo != null ? job.company.logo : '/images/default-company.png'}" style="width:30px; height:30px; border-radius:4px;">
+                            <span th:text="${job.company.companyName}">Công ty</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="admin-flex-col">
+                            <span th:text="${job.employer.fullname}">Tên NTD</span>
+                            <span class="admin-fs-sm admin-text-muted" th:text="${job.employer.email}">email</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="admin-badge admin-bg-success" th:if="${job.status and (job.isHidden == null or !job.isHidden)}">Đang hiển thị</span>
+                        <span class="admin-badge admin-bg-danger" th:if="${!job.status}">Đã đóng (Bởi NTD)</span>
+                        <span class="admin-badge admin-bg-secondary" th:if="${job.isHidden}">Bị ẩn (Bởi Admin)</span>
+                    </td>
+                    <td>
+                        <div class="admin-table-actions">
+                            <button type="button" class="admin-btn admin-btn-outline-secondary" th:attr="data-admin-modal-target='modal-job-' + ${job.id}">
+                                <i class="fa-solid fa-eye"></i> Xem
+                            </button>
+                            
+                            <form th:action="@{/admin/jobs/toggle-hide/{id}(id=${job.id})}" method="post"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái hiển thị của tin này?');">
+                                <button type="submit" class="admin-btn" th:classappend="${job.isHidden} ? 'admin-btn-outline-success' : 'admin-btn-outline-warning'">
+                                    <i class="fa-solid" th:classappend="${job.isHidden} ? 'fa-eye' : 'fa-eye-slash'"></i> 
+                                    <span th:text="${job.isHidden} ? 'Hiện' : 'Ẩn'"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modals for Job Details -->
+<th:block th:each="job : ${jobs}">
+    <div class="admin-modal-backdrop" th:id="'modal-job-' + ${job.id}">
+        <div class="admin-modal" style="max-width: 800px;">
+            <div class="admin-modal-header">
+                <h5 class="admin-modal-title" th:text="${job.title}"></h5>
+                <button type="button" class="admin-modal-close"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="admin-modal-body">
+                <div class="admin-flex admin-align-center admin-gap-2 admin-mb-2" style="background: var(--admin-bg); padding: 1rem; border-radius: 0.5rem;">
+                    <img th:src="${job.company.logo != null ? job.company.logo : '/images/default-company.png'}" style="width:60px; height:60px; border-radius:0.5rem; background:#fff; box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                    <div>
+                        <h6 class="admin-fw-bold admin-m-0 admin-mb-1" th:text="${job.company.companyName}"></h6>
+                        <p class="admin-text-muted admin-fs-sm admin-m-0"><i class="fa-solid fa-location-dot"></i> <span th:text="${job.location}"></span></p>
+                    </div>
+                </div>
+                
+                <div class="admin-grid-4 admin-mb-2" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <p class="admin-m-0 admin-mb-1"><i class="fa-solid fa-money-bill admin-text-success"></i> <strong>Mức lương:</strong> <span th:text="${job.salary}"></span></p>
+                        <p class="admin-m-0"><i class="fa-solid fa-briefcase admin-text-primary"></i> <strong>Hình thức:</strong> <span th:text="${job.workingType}"></span></p>
+                    </div>
+                    <div>
+                        <p class="admin-m-0 admin-mb-1"><i class="fa-solid fa-users admin-text-info"></i> <strong>Số lượng:</strong> <span th:text="${job.quantity}"></span></p>
+                        <p class="admin-m-0"><i class="fa-solid fa-calendar-xmark admin-text-danger"></i> <strong>Hạn nộp:</strong> <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}"></span></p>
+                    </div>
+                </div>
+                
+                <h6 class="admin-fw-bold admin-mt-2" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Mô tả công việc</h6>
+                <div th:utext="${job.description}" class="admin-fs-sm admin-text-muted"></div>
+                
+                <h6 class="admin-fw-bold admin-mt-2" style="border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Yêu cầu & Quyền lợi</h6>
+                <div th:utext="${job.benefit}" class="admin-fs-sm admin-text-muted"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<div th:replace="~{admin/fragments :: scripts}"></div>
+</body>
+</html>

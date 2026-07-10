@@ -2,13 +2,18 @@ package com.polyjobs.controller;
 
 import com.polyjobs.entity.Resume;
 import com.polyjobs.entity.User;
+import com.polyjobs.entity.Application;
+import com.polyjobs.entity.SavedJob;
 import com.polyjobs.repository.ResumeRepository;
 import com.polyjobs.repository.UserRepository;
+import com.polyjobs.repository.ApplicationRepository;
+import com.polyjobs.repository.SavedJobRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
@@ -33,6 +38,15 @@ public class ProfileController {
     @Autowired
     private ResumeRepository resumeRepository;
 
+    @Autowired
+    private com.polyjobs.repository.CompanyRepository companyRepository;
+
+    @Autowired
+    private ApplicationRepository applicationRepository;
+
+    @Autowired
+    private SavedJobRepository savedJobRepository;
+
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
@@ -48,10 +62,26 @@ public class ProfileController {
         session.setAttribute("loggedInUser", user);
         model.addAttribute("user", user);
 
-        // Nếu là ứng viên, lấy danh sách CV
+        // Nếu là ứng viên, lấy danh sách CV, lịch sử ứng tuyển, việc làm đã lưu
         if (Boolean.FALSE.equals(user.getRole())) {
             List<Resume> resumes = resumeRepository.findByCandidateOrderByUploadDateDesc(user);
             model.addAttribute("resumes", resumes);
+            
+            List<Application> applications = applicationRepository.findByCandidate(user);
+            model.addAttribute("applications", applications);
+            
+            List<SavedJob> savedJobs = savedJobRepository.findByCandidate(user);
+            model.addAttribute("savedJobs", savedJobs);
+        } else if (Boolean.TRUE.equals(user.getRole())) {
+            // Nếu là nhà tuyển dụng, lấy thông tin Công ty
+            com.polyjobs.entity.Company company = companyRepository.findFirstByEmployer(user);
+            if (company == null) {
+                company = new com.polyjobs.entity.Company();
+                company.setCompanyName("Chưa cập nhật tên công ty");
+                company.setEmployer(user);
+                companyRepository.save(company);
+            }
+            model.addAttribute("company", company);
         }
 
         return "profile";
@@ -82,6 +112,52 @@ public class ProfileController {
             userRepository.save(user);
             session.setAttribute("loggedInUser", user);
             redirectAttributes.addFlashAttribute("success", "Cập nhật thông tin thành công!");
+        }
+
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/update-company")
+    public String updateCompany(
+            @RequestParam("companyName") String companyName,
+            @RequestParam(value = "website", required = false) String website,
+            @RequestParam(value = "address", required = false) String address,
+            @RequestParam(value = "description", required = false) String description,
+            @RequestParam(value = "logoFile", required = false) MultipartFile logoFile,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null || !Boolean.TRUE.equals(loggedInUser.getRole())) {
+            return "redirect:/login";
+        }
+
+        com.polyjobs.entity.Company company = companyRepository.findFirstByEmployer(loggedInUser);
+        if (company != null) {
+            company.setCompanyName(companyName);
+            company.setWebsite(website);
+            company.setAddress(address);
+            company.setDescription(description);
+
+            if (logoFile != null && !logoFile.isEmpty()) {
+                try {
+                    String uploadDir = "src/main/resources/static/uploads/company/";
+                    File uploadDirFile = new File(uploadDir);
+                    if (!uploadDirFile.exists()) {
+                        uploadDirFile.mkdirs();
+                    }
+                    String originalFilename = logoFile.getOriginalFilename();
+                    String extension = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
+                    String newFilename = UUID.randomUUID().toString() + extension;
+                    Path path = Paths.get(uploadDir + newFilename);
+                    Files.copy(logoFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+                    company.setLogo("/uploads/company/" + newFilename);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            companyRepository.save(company);
+            redirectAttributes.addFlashAttribute("success", "Cập nhật thông tin công ty thành công!");
         }
 
         return "redirect:/profile";
@@ -184,6 +260,38 @@ public class ProfileController {
         } catch (IOException e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Đã xảy ra lỗi khi tải lên ảnh!");
+        }
+
+        return "redirect:/profile";
+    }
+
+    @PostMapping("/profile/delete-cv/{id}")
+    public String deleteCv(
+            @PathVariable("id") Integer id,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        if (loggedInUser == null) {
+            return "redirect:/login";
+        }
+
+        Resume resume = resumeRepository.findById(id).orElse(null);
+        if (resume != null && resume.getCandidate().getId().equals(loggedInUser.getId())) {
+            try {
+                String filePath = "src/main/resources/static" + resume.getFileName();
+                File file = new File(filePath);
+                if (file.exists()) {
+                    file.delete();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            resumeRepository.delete(resume);
+            redirectAttributes.addFlashAttribute("success", "Đã xóa CV thành công!");
+        } else {
+            redirectAttributes.addFlashAttribute("error", "Không thể xóa CV này!");
         }
 
         return "redirect:/profile";

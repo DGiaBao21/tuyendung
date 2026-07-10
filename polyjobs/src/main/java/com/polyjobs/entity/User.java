@@ -32,6 +32,12 @@ public class User {
     // 0: Candidate | 1: Employer/Admin
     private Boolean role = false;
 
+    // Phân quyền quản trị viên
+    private Boolean isAdmin = false;
+
+    // Trạng thái tài khoản (true: Hoạt động, false: Bị chặn)
+    private Boolean isActive = true;
+
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate = new Date();
 }

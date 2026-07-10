@@ -39,10 +39,13 @@
                 </a>
             </div>
             <div class="d-flex gap-2 align-items-center" th:if="${session.loggedInUser != null}">
+                <a th:if="${session.loggedInUser.isAdmin == true}" th:href="@{/admin/dashboard}" class="btn btn-sm btn-danger me-2">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Quản trị viên
+                </a>
                 <a th:href="@{/profile}" class="nav-user-info" style="text-decoration: none; color: inherit;">
                     <i class="fa-solid fa-user-circle me-1"></i>
                     <span th:text="${session.loggedInUser.fullname}">User</span>
-                    <span th:if="${session.loggedInUser.role == true}"
+                    <span th:if="${session.loggedInUser.role == true and session.loggedInUser.isAdmin != true}"
                         style="background: var(--gradient-cta); color: #fff; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 4px;">
                         NTD
                     </span>

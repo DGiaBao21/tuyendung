@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Quản lý người dùng')}"></head>
+<body>
+
+<div th:replace="~{admin/fragments :: sidebar('users')}"></div>
+
+<div class="admin-main">
+    <!-- Topbar -->
+    <div class="admin-topbar">
+        <h4 class="admin-m-0 admin-fw-bold">Quản lý Người dùng</h4>
+        <div class="admin-flex admin-align-center admin-gap-1">
+            <span class="admin-text-muted">Xin chào, <strong th:text="${session.loggedInUser.fullname}">Admin</strong></span>
+        </div>
+    </div>
+
+    <!-- Alert Messages -->
+    <div th:if="${success}" class="admin-alert admin-alert-success">
+        <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="admin-alert admin-alert-danger">
+        <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
+    </div>
+
+    <!-- Users Table -->
+    <div class="admin-card">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Người dùng</th>
+                    <th>Email / SĐT</th>
+                    <th>Vai trò</th>
+                    <th>Trạng thái</th>
+                    <th class="admin-text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="user : ${users}">
+                    <td class="admin-text-muted" th:text="${user.id}">1</td>
+                    <td>
+                        <div class="admin-flex admin-align-center admin-gap-1">
+                            <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" 
+                                 class="admin-avatar">
+                            <div class="admin-flex-col">
+                                <span class="admin-fw-bold" th:text="${user.fullname}">Tên người dùng</span>
+                                <span class="admin-fs-sm admin-text-muted" th:text="'@' + ${user.username}">username</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="admin-fs-sm" th:text="${user.email}">email@example.com</div>
+                        <div class="admin-fs-sm admin-text-muted" th:text="${user.phone}">0123456789</div>
+                    </td>
+                    <td>
+                        <span class="admin-badge admin-bg-danger" th:if="${user.isAdmin == true}">Admin</span>
+                        <span class="admin-badge admin-bg-primary" th:if="${user.isAdmin != true and user.role == true}">Nhà tuyển dụng</span>
+                        <span class="admin-badge admin-bg-info" th:if="${user.isAdmin != true and user.role != true}">Ứng viên</span>
+                    </td>
+                    <td>
+                        <span class="admin-badge admin-bg-success" th:if="${user.isActive == true}">Hoạt động</span>
+                        <span class="admin-badge admin-bg-secondary" th:if="${user.isActive != true}">Bị chặn</span>
+                    </td>
+                    <td>
+                        <div class="admin-table-actions">
+                            <button type="button" class="admin-btn admin-btn-outline-secondary" th:attr="data-admin-modal-target='modal-user-' + ${user.id}">
+                                <i class="fa-solid fa-eye"></i> Xem
+                            </button>
+                            
+                            <form th:if="${user.id != session.loggedInUser.id and user.isAdmin != true}" 
+                                  th:action="@{/admin/users/toggle-block/{id}(id=${user.id})}" method="post"
+                                  onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái người dùng này?');">
+                                <button type="submit" class="admin-btn" th:classappend="${user.isActive == true} ? 'admin-btn-outline-danger' : 'admin-btn-outline-success'">
+                                    <i class="fa-solid" th:classappend="${user.isActive == true} ? 'fa-ban' : 'fa-check'"></i> 
+                                    <span th:text="${user.isActive == true} ? 'Chặn' : 'Bỏ chặn'"></span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modals for User Details -->
+<th:block th:each="user : ${users}">
+    <div class="admin-modal-backdrop" th:id="'modal-user-' + ${user.id}">
+        <div class="admin-modal">
+            <div class="admin-modal-header">
+                <h5 class="admin-modal-title">Thông tin Người dùng</h5>
+                <button type="button" class="admin-modal-close"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <div class="admin-modal-body admin-text-center">
+                <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" 
+                     class="admin-avatar-lg admin-mb-1">
+                <h4 class="admin-fw-bold admin-m-0" th:text="${user.fullname}"></h4>
+                <p class="admin-text-muted admin-mb-2">@<span th:text="${user.username}"></span></p>
+                
+                <div style="background: var(--admin-bg); padding: 1rem; border-radius: 0.5rem; text-align: left;">
+                    <p class="admin-m-0 admin-mb-1"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
+                    <p class="admin-m-0 admin-mb-1"><strong>Điện thoại:</strong> <span th:text="${user.phone}"></span></p>
+                    <p class="admin-m-0 admin-mb-1"><strong>Địa chỉ:</strong> <span th:text="${user.address}"></span></p>
+                    <p class="admin-m-0" th:if="${!user.role}"><strong>Ngành nghề:</strong> <span th:text="${user.profession}"></span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+<div th:replace="~{admin/fragments :: scripts}"></div>
+</body>
+</html>

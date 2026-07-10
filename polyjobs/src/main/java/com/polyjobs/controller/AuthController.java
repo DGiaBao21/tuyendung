@@ -37,9 +37,18 @@ public class AuthController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        username = username != null ? username.trim() : "";
+        password = password != null ? password.trim() : "";
+
         User user = userRepository.findByUsernameAndPassword(username, password);
 
         if (user != null) {
+            // Kiểm tra xem tài khoản có bị chặn không
+            if (user.getIsActive() != null && !user.getIsActive()) {
+                redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+                return "redirect:/login";
+            }
+            
             // Lưu thông tin user vào session
             session.setAttribute("loggedInUser", user);
             return "redirect:/";
@@ -69,6 +78,11 @@ public class AuthController {
             @RequestParam(value = "companyAddress", required = false) String companyAddress,
             @RequestParam(value = "companyWebsite", required = false) String companyWebsite,
             RedirectAttributes redirectAttributes) {
+
+        // Trim inputs
+        username = username != null ? username.trim() : "";
+        password = password != null ? password.trim() : "";
+        email = email != null ? email.trim() : "";
 
         // Kiểm tra username đã tồn tại
         if (userRepository.existsByUsername(username)) {

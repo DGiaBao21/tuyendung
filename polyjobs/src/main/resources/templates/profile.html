@@ -19,11 +19,19 @@
             <!-- Avatar & Overview -->
             <div class="col-md-4 mb-4">
                 <div class="card p-4 text-center">
-                    <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" class="rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
-                    <form action="/profile/upload-avatar" method="post" enctype="multipart/form-data" class="mb-3">
-                        <input type="file" name="avatarFile" id="avatarFile" accept="image/*" class="d-none" onchange="this.form.submit()">
-                        <label for="avatarFile" class="btn btn-sm btn-outline-primary" style="cursor: pointer;"><i class="fa-solid fa-camera"></i> Đổi ảnh</label>
-                    </form>
+                    <!-- Nếu là Ứng viên: Hiển thị avatar cá nhân và nút đổi ảnh -->
+                    <div th:if="${!user.role}">
+                        <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" class="rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                        <form action="/profile/upload-avatar" method="post" enctype="multipart/form-data" class="mb-3">
+                            <input type="file" name="avatarFile" id="avatarFile" accept="image/*" class="d-none" onchange="this.form.submit()">
+                            <label for="avatarFile" class="btn btn-sm btn-outline-primary" style="cursor: pointer;"><i class="fa-solid fa-camera"></i> Đổi ảnh</label>
+                        </form>
+                    </div>
+
+                    <!-- Nếu là Nhà tuyển dụng: Hiển thị logo công ty (không có nút đổi ảnh ở đây vì đã có ở phần thông tin công ty) -->
+                    <div th:if="${user.role}">
+                        <img th:src="${company != null and company.logo != null ? company.logo : '/images/default-company.png'}" class="rounded-circle mx-auto mb-3 border" style="width: 120px; height: 120px; object-fit: cover; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+                    </div>
                     <h4 th:text="${user.fullname}">Họ tên</h4>
                     <p class="text-muted" th:text="${user.email}">email@example.com</p>
                     <span class="badge bg-primary" th:if="${user.role}">Nhà tuyển dụng</span>
@@ -33,7 +41,8 @@
 
             <!-- Profile details -->
             <div class="col-md-8">
-                <div class="card p-4 mb-4 fade-in-up">
+                <!-- Chỉ hiển thị thông tin cá nhân cho ứng viên -->
+                <div class="card p-4 mb-4 fade-in-up" th:if="${!user.role}">
                     <h5 class="mb-4">Thông tin cá nhân</h5>
                     <form action="/profile/update" method="post">
                         <div class="mb-3">
@@ -61,6 +70,46 @@
                             <input type="text" class="form-control" name="profession" th:value="${user.profession}" placeholder="Ví dụ: IT, Thiết kế đồ họa, Kế toán...">
                         </div>
                         <button type="submit" class="btn btn-primary" style="background: var(--gradient-primary); border: none;">Lưu thay đổi</button>
+                    </form>
+                </div>
+
+                <!-- Company details (Only for Employer) -->
+                <div class="card p-4 mb-4 fade-in-up" th:if="${user.role}">
+                    <h5 class="mb-4">Thông tin Công ty</h5>
+                    <div class="d-flex align-items-center mb-4">
+                        <img th:src="${company != null and company.logo != null ? company.logo : '/images/default-company.png'}" 
+                             alt="Logo công ty" class="rounded me-3 border" style="width: 80px; height: 80px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-1" th:text="${company != null ? company.companyName : 'Tên công ty'}"></h6>
+                            <p class="text-muted small mb-0">Hãy cập nhật logo và thông tin chi tiết để thu hút ứng viên</p>
+                        </div>
+                    </div>
+                    
+                    <form action="/profile/update-company" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label class="form-label">Tên Công ty</label>
+                            <input type="text" class="form-control" name="companyName" th:value="${company != null ? company.companyName : ''}" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" name="website" th:value="${company != null ? company.website : ''}" placeholder="https://...">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Địa chỉ Công ty</label>
+                                <input type="text" class="form-control" name="address" th:value="${company != null ? company.address : ''}">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Tải lên Logo Công ty mới</label>
+                            <input type="file" class="form-control" name="logoFile" accept="image/*">
+                            <small class="text-muted">Chỉ nhận file ảnh, tối ưu là hình vuông.</small>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">Giới thiệu về Công ty</label>
+                            <textarea class="form-control" name="description" rows="5" placeholder="Mô tả về lịch sử, môi trường làm việc, chế độ đãi ngộ..." th:text="${company != null ? company.description : ''}"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background: var(--gradient-primary); border: none;">Lưu thông tin Công ty</button>
                     </form>
                 </div>
 
@@ -96,8 +145,11 @@
                                         <span th:text="${cv.title}">CV.pdf</span>
                                     </td>
                                     <td th:text="${#dates.format(cv.uploadDate, 'dd/MM/yyyy HH:mm')}">01/01/2026</td>
-                                    <td>
+                                    <td class="d-flex gap-2">
                                         <a th:href="@{${cv.fileName}}" target="_blank" class="btn btn-sm btn-outline-primary">Tải về / Xem</a>
+                                        <form th:action="@{/profile/delete-cv/{id}(id=${cv.id})}" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn xóa CV này?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i> Xóa</button>
+                                        </form>
                                     </td>
                                 </tr>
                             </tbody>
@@ -116,6 +168,73 @@
                     <div th:if="${resumes == null or resumes.isEmpty()}" class="alert alert-light border text-center text-muted">
                         <i class="fa-solid fa-file-invoice mb-2 fs-3"></i><br>
                         Bạn chưa tải lên hồ sơ nào.
+                    </div>
+                </div>
+
+                <!-- Lịch sử ứng tuyển (Only for Candidate) -->
+                <div class="card p-4 fade-in-up mt-4" th:if="${!user.role}">
+                    <h5 class="mb-4">Lịch sử ứng tuyển</h5>
+                    <div class="table-responsive" th:if="${applications != null and !applications.isEmpty()}">
+                        <table class="table table-hover align-middle border">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Công việc</th>
+                                    <th>Ngày ứng tuyển</th>
+                                    <th>Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="app : ${applications}">
+                                    <td>
+                                        <a th:href="@{/job/{id}(id=${app.job.id})}" class="fw-bold text-decoration-none" th:text="${app.job.title}">Tên công việc</a>
+                                        <div class="small text-muted" th:text="${app.job.company != null ? app.job.company.companyName : ''}">Công ty</div>
+                                    </td>
+                                    <td th:text="${#dates.format(app.applyDate, 'dd/MM/yyyy')}">01/01/2026</td>
+                                    <td>
+                                        <span class="badge" th:classappend="${app.status == 'Chờ duyệt' ? 'bg-warning text-dark' : (app.status == 'Từ chối' ? 'bg-danger' : 'bg-success')}" th:text="${app.status}">Trạng thái</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${applications == null or applications.isEmpty()}" class="alert alert-light border text-center text-muted">
+                        <i class="fa-solid fa-paper-plane mb-2 fs-3"></i><br>
+                        Bạn chưa ứng tuyển công việc nào.
+                    </div>
+                </div>
+
+                <!-- Việc làm đã lưu (Only for Candidate) -->
+                <div class="card p-4 fade-in-up mt-4" th:if="${!user.role}">
+                    <h5 class="mb-4">Việc làm đã lưu</h5>
+                    <div class="table-responsive" th:if="${savedJobs != null and !savedJobs.isEmpty()}">
+                        <table class="table table-hover align-middle border">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Công việc</th>
+                                    <th>Ngày lưu</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="saved : ${savedJobs}">
+                                    <td>
+                                        <a th:href="@{/job/{id}(id=${saved.job.id})}" class="fw-bold text-decoration-none" th:text="${saved.job.title}">Tên công việc</a>
+                                        <div class="small text-muted" th:text="${saved.job.company != null ? saved.job.company.companyName : ''}">Công ty</div>
+                                    </td>
+                                    <td th:text="${#dates.format(saved.saveDate, 'dd/MM/yyyy')}">01/01/2026</td>
+                                    <td>
+                                        <form th:action="@{/job/save}" method="post">
+                                            <input type="hidden" name="jobId" th:value="${saved.job.id}">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart-crack"></i> Bỏ lưu</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div th:if="${savedJobs == null or savedJobs.isEmpty()}" class="alert alert-light border text-center text-muted">
+                        <i class="fa-solid fa-heart mb-2 fs-3"></i><br>
+                        Bạn chưa lưu công việc nào.
                     </div>
                 </div>
             </div>

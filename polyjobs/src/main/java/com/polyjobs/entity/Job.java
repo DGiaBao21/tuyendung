@@ -28,12 +28,16 @@ public class Job {
     private String benefit;
 
     @Temporal(TemporalType.DATE)
+    @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date deadline;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate = new Date();
 
     private Boolean status = true; // 1: Active, 0: Closed
+
+    // Admin có thể ẩn tin tuyển dụng không hợp lệ
+    private Boolean isHidden = false;
 
     @ManyToOne
     @JoinColumn(name = "companyID")

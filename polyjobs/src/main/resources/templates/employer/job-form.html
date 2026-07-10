@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head(${job != null ? 'Sửa tin tuyển dụng' : 'Đăng tin tuyển dụng'})}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('employer')}"></nav>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0 text-primary">
+                        <i class="fa-solid fa-pen-to-square me-2"></i> 
+                        <span th:text="${job != null ? 'Sửa tin tuyển dụng' : 'Đăng tin tuyển dụng mới'}">Đăng tin</span>
+                    </h2>
+                    <a th:href="@{/employer/jobs}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i> Quay lại</a>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 p-md-5">
+                        <form th:action="@{/employer/job/save}" method="post">
+                            <input type="hidden" name="id" th:value="${job?.id}">
+                            
+                            <h5 class="mb-3 text-secondary">Thông tin cơ bản</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-12">
+                                    <label class="form-label fw-bold">Tiêu đề công việc <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-lg" name="title" th:value="${job?.title}" required placeholder="VD: Lập trình viên Java Senior">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Ngành nghề <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="categoryId" required>
+                                        <option value="" disabled selected>-- Chọn ngành nghề --</option>
+                                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${job?.category?.id == cat.id}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Khu vực làm việc <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="location" required>
+                                        <option value="" disabled selected>-- Chọn tỉnh thành --</option>
+                                        <option value="An Giang" th:selected="${job?.location == 'An Giang'}">An Giang</option>
+                                        <option value="Bạc Liêu" th:selected="${job?.location == 'Bạc Liêu'}">Bạc Liêu</option>
+                                        <option value="Bến Tre" th:selected="${job?.location == 'Bến Tre'}">Bến Tre</option>
+                                        <option value="Cà Mau" th:selected="${job?.location == 'Cà Mau'}">Cà Mau</option>
+                                        <option value="Cần Thơ" th:selected="${job?.location == 'Cần Thơ'}">Cần Thơ</option>
+                                        <option value="Đồng Tháp" th:selected="${job?.location == 'Đồng Tháp'}">Đồng Tháp</option>
+                                        <option value="Hậu Giang" th:selected="${job?.location == 'Hậu Giang'}">Hậu Giang</option>
+                                        <option value="Kiên Giang" th:selected="${job?.location == 'Kiên Giang'}">Kiên Giang</option>
+                                        <option value="Long An" th:selected="${job?.location == 'Long An'}">Long An</option>
+                                        <option value="Sóc Trăng" th:selected="${job?.location == 'Sóc Trăng'}">Sóc Trăng</option>
+                                        <option value="Tiền Giang" th:selected="${job?.location == 'Tiền Giang'}">Tiền Giang</option>
+                                        <option value="Trà Vinh" th:selected="${job?.location == 'Trà Vinh'}">Trà Vinh</option>
+                                        <option value="Vĩnh Long" th:selected="${job?.location == 'Vĩnh Long'}">Vĩnh Long</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Mức lương</label>
+                                    <input type="text" class="form-control" name="salary" th:value="${job?.salary}" placeholder="VD: 15 - 20 Triệu, Thỏa thuận...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Kinh nghiệm</label>
+                                    <input type="text" class="form-control" name="experience" th:value="${job?.experience}" placeholder="VD: Không yêu cầu, 1 năm, 2 năm...">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Hình thức làm việc</label>
+                                    <select class="form-select" name="workingType">
+                                        <option value="Toàn thời gian" th:selected="${job?.workingType == 'Toàn thời gian'}">Toàn thời gian</option>
+                                        <option value="Bán thời gian" th:selected="${job?.workingType == 'Bán thời gian'}">Bán thời gian</option>
+                                        <option value="Thực tập" th:selected="${job?.workingType == 'Thực tập'}">Thực tập</option>
+                                        <option value="Freelance" th:selected="${job?.workingType == 'Freelance'}">Freelance</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Số lượng cần tuyển</label>
+                                    <input type="number" class="form-control" name="quantity" th:value="${job?.quantity}" min="1" placeholder="VD: 1">
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-secondary mt-5">Chi tiết công việc</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" name="description" rows="6" required placeholder="- Tham gia phát triển...&#10;- Xây dựng các chức năng...&#10;- Phối hợp với team..." th:text="${job?.description}"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-bold">Quyền lợi được hưởng</label>
+                                    <textarea class="form-control" name="benefit" rows="4" placeholder="- Lương tháng 13...&#10;- BHXH, BHYT...&#10;- Môi trường trẻ trung..." th:text="${job?.benefit}"></textarea>
+                                </div>
+                            </div>
+
+                            <h5 class="mb-3 text-secondary mt-5">Cài đặt hiển thị</h5>
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Hạn nộp hồ sơ <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" name="deadline" th:value="${job?.deadline != null ? #dates.format(job.deadline, 'yyyy-MM-dd') : ''}" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Trạng thái tin</label>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" name="status" id="statusSwitch" th:checked="${job == null or job.status}">
+                                        <label class="form-check-label" for="statusSwitch">Hiển thị / Mở nhận hồ sơ</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-5">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">
+                                    <i class="fa-solid fa-floppy-disk me-2"></i> Lưu tin tuyển dụng
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

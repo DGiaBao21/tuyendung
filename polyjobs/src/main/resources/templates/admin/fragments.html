@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} + ' - Quản trị PolyJobs'">Admin PolyJobs</title>
+    <!-- Custom Admin CSS -->
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Sidebar Fragment -->
+<div th:fragment="sidebar(activeMenu)" class="admin-sidebar">
+    <div class="admin-sidebar-header">
+        <a href="/" class="admin-sidebar-title">
+            <i class="fa-solid fa-briefcase admin-text-primary"></i> PolyJobs
+        </a>
+        <p class="admin-text-muted admin-fs-sm admin-m-0 admin-mt-1">Admin Panel</p>
+    </div>
+    <ul class="admin-flex-col">
+        <li class="admin-nav-item">
+            <a class="admin-nav-link" th:classappend="${activeMenu == 'dashboard'} ? 'active'" th:href="@{/admin/dashboard}">
+                <i class="fa-solid fa-chart-pie"></i> Bảng điều khiển
+            </a>
+        </li>
+        <li class="admin-nav-item">
+            <a class="admin-nav-link" th:classappend="${activeMenu == 'users'} ? 'active'" th:href="@{/admin/users}">
+                <i class="fa-solid fa-users"></i> Quản lý Người dùng
+            </a>
+        </li>
+        <li class="admin-nav-item">
+            <a class="admin-nav-link" th:classappend="${activeMenu == 'jobs'} ? 'active'" th:href="@{/admin/jobs}">
+                <i class="fa-solid fa-briefcase"></i> Quản lý Việc làm
+            </a>
+        </li>
+        <div class="admin-sidebar-divider"></div>
+        <li class="admin-nav-item">
+            <a class="admin-nav-link admin-text-danger" th:href="@{/logout}">
+                <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Scripts Fragment -->
+<div th:fragment="scripts">
+    <script th:src="@{/js/admin.js}"></script>
+</div>
+
+</body>
+</html>

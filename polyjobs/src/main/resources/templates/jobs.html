@@ -18,11 +18,14 @@
 
             <!-- Search Filter Bar -->
             <form class="search-filter-bar" action="/jobs" method="get" id="searchFilterForm">
-                <div class="d-flex flex-column flex-md-row gap-2">
-                    <input type="text" class="form-control" name="keyword"
-                        placeholder="Tên công việc, vị trí, công ty..."
-                        th:value="${keyword}" id="searchKeyword">
-                    <select class="form-select" name="location" id="searchLocation" style="max-width: 250px;">
+                <div class="row g-2 mb-2">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="keyword"
+                            placeholder="Tên công việc, vị trí, công ty..."
+                            th:value="${keyword}" id="searchKeyword">
+                    </div>
+                    <div class="col-md-6">
+                        <select class="form-select" name="location" id="searchLocation">
                         <option value="">Tất cả tỉnh thành</option>
                         <option value="An Giang" th:selected="${location == 'An Giang'}">An Giang</option>
                         <option value="Bạc Liêu" th:selected="${location == 'Bạc Liêu'}">Bạc Liêu</option>
@@ -38,9 +41,30 @@
                         <option value="Trà Vinh" th:selected="${location == 'Trà Vinh'}">Trà Vinh</option>
                         <option value="Vĩnh Long" th:selected="${location == 'Vĩnh Long'}">Vĩnh Long</option>
                     </select>
-                    <button class="btn btn-search" type="submit" style="white-space: nowrap;">
-                        <i class="fa-solid fa-magnifying-glass me-1"></i> TÌM KIẾM
-                    </button>
+                    </div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <select class="form-select" name="categoryId" id="searchCategory">
+                            <option value="">Tất cả ngành nghề</option>
+                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select class="form-select" name="salary" id="searchSalary">
+                            <option value="">Mọi mức lương</option>
+                            <option value="Thỏa thuận" th:selected="${salary == 'Thỏa thuận'}">Thỏa thuận</option>
+                            <option value="Dưới 10" th:selected="${salary == 'Dưới 10'}">Dưới 10 triệu</option>
+                            <option value="10 - 15" th:selected="${salary == '10 - 15'}">10 - 15 triệu</option>
+                            <option value="15 - 20" th:selected="${salary == '15 - 20'}">15 - 20 triệu</option>
+                            <option value="Trên 20" th:selected="${salary == 'Trên 20'}">Trên 20 triệu</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-search w-100" type="submit">
+                            <i class="fa-solid fa-magnifying-glass me-1"></i> TÌM KIẾM
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
@@ -59,6 +83,9 @@
                 </span>
                 <span th:if="${location != null && !location.isEmpty()}">
                     tại <strong th:text="${location}">location</strong>
+                </span>
+                <span th:if="${salary != null && !salary.isEmpty()}">
+                    (Lương: <strong th:text="${salary}">salary</strong>)
                 </span>
             </div>
 

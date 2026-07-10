@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Quản lý ứng viên')}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('employer')}"></nav>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1"><i class="fa-solid fa-users me-2 text-primary"></i> Danh sách ứng viên</h2>
+                <p class="text-muted mb-0">Công việc: <strong th:text="${job.title}"></strong></p>
+            </div>
+            <a th:href="@{/employer/jobs}" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-2"></i> Quay lại</a>
+        </div>
+
+        <div class="alert alert-success" th:if="${success}">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ứng viên</th>
+                                <th>Thông tin liên hệ</th>
+                                <th>CV & Thư giới thiệu</th>
+                                <th>Ngày nộp</th>
+                                <th>Trạng thái</th>
+                                <th class="text-end">Cập nhật trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app : ${applications}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <img th:src="${app.candidate.avatar != null ? app.candidate.avatar : 'https://ui-avatars.com/api/?name=' + app.candidate.fullname + '&background=random'}" 
+                                             class="rounded-circle me-3" style="width: 45px; height: 45px; object-fit: cover;">
+                                        <div>
+                                            <div class="fw-bold" th:text="${app.candidate.fullname}">Họ tên</div>
+                                            <div class="small text-muted" th:text="${app.candidate.profession}">Nghề nghiệp</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small"><i class="fa-solid fa-envelope me-1 text-muted"></i> <span th:text="${app.candidate.email}"></span></div>
+                                    <div class="small"><i class="fa-solid fa-phone me-1 text-muted"></i> <span th:text="${app.candidate.phone}"></span></div>
+                                </td>
+                                <td>
+                                    <a th:if="${app.resume != null}" th:href="@{${app.resume.fileName}}" target="_blank" class="btn btn-sm btn-outline-primary mb-1">
+                                        <i class="fa-solid fa-file-pdf"></i> Xem CV
+                                    </a>
+                                    <button th:if="${app.coverLetter != null and !app.coverLetter.isEmpty()}" 
+                                            class="btn btn-sm btn-outline-secondary mb-1" 
+                                            data-bs-toggle="modal" th:data-bs-target="'#coverLetterModal' + ${app.id}">
+                                        <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
+                                    </button>
+
+                                    <!-- Cover Letter Modal -->
+                                    <div class="modal fade" th:id="'coverLetterModal' + ${app.id}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title">Thư giới thiệu của <span th:text="${app.candidate.fullname}"></span></h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p style="white-space: pre-wrap;" th:text="${app.coverLetter}"></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td th:text="${#dates.format(app.applyDate, 'dd/MM/yyyy')}"></td>
+                                <td>
+                                    <span class="badge" th:classappend="${app.status == 'Chờ duyệt' ? 'bg-warning text-dark' : (app.status == 'Từ chối' ? 'bg-danger' : (app.status == 'Hẹn phỏng vấn' ? 'bg-info text-dark' : 'bg-success'))}" th:text="${app.status}">Trạng thái</span>
+                                </td>
+                                <td class="text-end">
+                                    <form th:action="@{/employer/application/status}" method="post" class="d-flex flex-column align-items-end gap-2">
+                                        <input type="hidden" name="applicationId" th:value="${app.id}">
+                                        <div class="d-flex gap-2 w-100 justify-content-end">
+                                            <select class="form-select form-select-sm w-auto" name="status">
+                                                <option value="Chờ duyệt" th:selected="${app.status == 'Chờ duyệt'}">Chờ duyệt</option>
+                                                <option value="Đã xem" th:selected="${app.status == 'Đã xem'}">Đã xem</option>
+                                                <option value="Hẹn phỏng vấn" th:selected="${app.status == 'Hẹn phỏng vấn'}">Hẹn phỏng vấn</option>
+                                                <option value="Trúng tuyển" th:selected="${app.status == 'Trúng tuyển'}">Trúng tuyển</option>
+                                                <option value="Từ chối" th:selected="${app.status == 'Từ chối'}">Từ chối</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-sm btn-primary">Lưu</button>
+                                        </div>
+                                        <input type="text" class="form-control form-control-sm mt-1" name="note" placeholder="Lời nhắn (thời gian phỏng vấn, lý do...)" th:value="${app.note}" style="max-width: 250px;">
+                                    </form>
+                                </td>
+                            </tr>
+                            <tr th:if="${applications.isEmpty()}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-folder-open fs-1 mb-3 d-block"></i>
+                                    Chưa có ứng viên nào ứng tuyển công việc này.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>
