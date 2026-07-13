@@ -1764,3 +1764,20 @@ a {
         font-size: 1.5rem;
     }
 }
+
+/* Dropdown on hover */
+@media all and (min-width: 992px) {
+  .navbar .dropdown:hover .dropdown-menu { display: block; margin-top: 0; }
+}
+
+/* Company Logo Cards */
+.company-logo-card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: var(--shadow-sm); text-align: center; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.05); cursor: pointer; }
+.company-logo-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--primary-color); }
+.company-logo-card img { filter: grayscale(100%) opacity(70%); transition: all 0.3s ease; max-height: 50px; }
+.company-logo-card:hover img { filter: grayscale(0%) opacity(100%); }
+
+/* How it Works */
+.step-card { padding: 30px; background: #fff; border-radius: 16px; transition: all 0.3s ease; height: 100%; border: 1px solid rgba(0,0,0,0.03); }
+.step-card:hover { transform: translateY(-10px); box-shadow: var(--shadow-md); border-color: var(--primary-color); }
+.step-icon { width: 80px; height: 80px; margin: 0 auto; background: var(--primary-100); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-bottom: 20px; transition: all 0.3s ease; }
+.step-card:hover .step-icon { background: var(--gradient-primary); color: #fff; transform: scale(1.1); }

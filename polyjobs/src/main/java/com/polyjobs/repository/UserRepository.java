@@ -1,6 +1,7 @@
 package com.polyjobs.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import com.polyjobs.entity.User;
 import java.util.List;
@@ -25,4 +26,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     // Lấy danh sách người dùng theo vai trò và ngành nghề (tìm kiếm tương đối)
     List<User> findByRoleAndProfessionContainingIgnoreCase(Boolean role, String profession);
+
+    // Lấy danh sách ngành nghề độc nhất của ứng viên (cho dropdown filter)
+    @Query("SELECT DISTINCT u.profession FROM User u WHERE u.role = false AND u.profession IS NOT NULL AND u.profession <> ''")
+    List<String> findDistinctProfessions();
 }

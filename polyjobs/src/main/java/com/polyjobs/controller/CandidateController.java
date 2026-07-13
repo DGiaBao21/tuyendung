@@ -10,9 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class CandidateController {
@@ -25,18 +24,32 @@ public class CandidateController {
 
     @GetMapping("/candidates")
     public String candidatesList(
+            @RequestParam(value = "keyword", required = false) String keyword,
             @RequestParam(value = "profession", required = false) String profession,
             Model model) {
 
-        List<User> candidates;
+        boolean hasKeyword  = keyword   != null && !keyword.trim().isEmpty();
+        boolean hasProfession = profession != null && !profession.trim().isEmpty();
 
-        if (profession != null && !profession.trim().isEmpty()) {
-            candidates = userRepository.findByRoleAndProfessionContainingIgnoreCase(false, profession.trim());
-        } else {
-            candidates = userRepository.findByRole(false);
-        }
+        // Lấy tất cả ứng viên (role = false) rồi lọc phía Java
+        List<User> all = userRepository.findByRole(false);
 
-        // Tạo map để ánh xạ User ID sang CV mới nhất của họ
+        List<User> candidates = all.stream().filter(u -> {
+            boolean matchKw = true;
+            boolean matchPr = true;
+            if (hasKeyword) {
+                String kw = keyword.trim().toLowerCase();
+                matchKw = (u.getFullname()  != null && u.getFullname().toLowerCase().contains(kw))
+                       || (u.getProfession() != null && u.getProfession().toLowerCase().contains(kw));
+            }
+            if (hasProfession) {
+                matchPr = u.getProfession() != null &&
+                          u.getProfession().toLowerCase().contains(profession.trim().toLowerCase());
+            }
+            return matchKw && matchPr;
+        }).collect(Collectors.toList());
+
+        // Map User ID -> CV mới nhất
         Map<Integer, Resume> candidateCvMap = new HashMap<>();
         for (User candidate : candidates) {
             List<Resume> resumes = resumeRepository.findByCandidateOrderByUploadDateDesc(candidate);
@@ -45,9 +58,20 @@ public class CandidateController {
             }
         }
 
+        // Danh sách ngành nghề cho dropdown — lọc từ danh sách tất cả ứng viên
+        List<String> professions = all.stream()
+                .map(User::getProfession)
+                .filter(p -> p != null && !p.trim().isEmpty())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
         model.addAttribute("candidates", candidates);
         model.addAttribute("candidateCvMap", candidateCvMap);
-        model.addAttribute("keyword", profession);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedProfession", profession);
+        model.addAttribute("professions", professions);
+        model.addAttribute("totalResults", candidates.size());
 
         return "candidates";
     }

@@ -1,60 +1,62 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments :: head('Danh Sách Công Ty')}"></head>
-
 <body>
+<nav th:replace="~{fragments :: navbar('companies')}"></nav>
 
-    <!-- Navbar -->
-    <nav th:replace="~{fragments :: navbar('companies')}"></nav>
+<!-- Hero Banner -->
+<section style="background: linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 40%, #0f766e 100%); padding: 56px 0; text-align:center; position:relative; overflow:hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.03%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <h1 style="font-size:2.2rem;font-weight:800;color:#fff;margin-bottom:8px;">
+      <i class="fa-solid fa-building me-2" style="color:#34d399;"></i> Công Ty Tuyển Dụng
+    </h1>
+    <p style="color:rgba(255,255,255,.7);font-size:1rem;">Các doanh nghiệp hàng đầu đang tuyển dụng tại Đồng bằng sông Cửu Long</p>
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 16px;margin-top:16px;font-size:.85rem;color:rgba(255,255,255,.8);">
+      <i class="fa-solid fa-building-circle-check"></i>
+      <span th:text="${companies.size()} + ' doanh nghiệp đã đăng ký'">0 doanh nghiệp đã đăng ký</span>
+    </div>
+  </div>
+</section>
 
-    <!-- ═══ PAGE HEADER ═══ -->
-    <section class="page-header" id="companiesHeader">
-        <div class="container">
-            <h1 class="page-header-title">
-                <i class="fa-solid fa-building me-2"></i> Công Ty Tuyển Dụng
-            </h1>
-            <p class="page-header-subtitle">Các doanh nghiệp đang tuyển dụng tại Đồng bằng sông Cửu Long</p>
-        </div>
-    </section>
-
-    <!-- ═══ COMPANY GRID ═══ -->
-    <section class="section-container" id="companyGrid">
-        <div class="container">
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3" th:each="company : ${companies}">
-                    <a th:href="@{/company/{id}(id=${company.id})}" style="text-decoration: none;">
-                        <div class="company-card fade-in-up">
-                            <div class="company-card-logo"
-                                th:text="${company.companyName != null ? company.companyName.substring(0,1) : 'C'}">
-                                C
-                            </div>
-                            <div class="company-card-name" th:text="${company.companyName}">Tên Công Ty</div>
-                            <div class="company-card-address">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span th:text="${company.address != null ? company.address : 'Đang cập nhật'}">Cần Thơ</span>
-                            </div>
-                            <div class="company-card-jobs">
-                                <i class="fa-solid fa-briefcase"></i> Xem việc làm
-                            </div>
-                        </div>
-                    </a>
-                </div>
+<!-- Companies Grid -->
+<section style="background:#f8fafc; padding: 48px 0 64px;">
+  <div class="container">
+    <div class="row g-4" th:if="${!#lists.isEmpty(companies)}">
+      <div class="col-sm-6 col-lg-4" th:each="company : ${companies}">
+        <a th:href="@{/company/{id}(id=${company.id})}" style="text-decoration:none;">
+          <div style="background:#fff;border-radius:16px;border:1.5px solid #e8eaf0;padding:28px;text-align:center;transition:all .25s;height:100%;box-shadow:0 1px 4px rgba(0,0,0,.04);" onmouseover="this.style.borderColor='#059669';this.style.transform='translateY(-4px)';this.style.boxShadow='0 12px 32px rgba(5,150,105,.12)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.transform='';this.style.boxShadow='0 1px 4px rgba(0,0,0,.04)'">
+            <!-- Logo -->
+            <div style="width:72px;height:72px;border-radius:16px;background:linear-gradient(135deg,#059669,#0f766e);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.8rem;font-weight:800;margin:0 auto 16px;box-shadow:0 4px 14px rgba(5,150,105,.25);"
+                 th:text="${company.companyName != null ? company.companyName.substring(0,1).toUpperCase() : 'C'}">C</div>
+            <!-- Name -->
+            <h5 style="font-weight:700;color:#0f172a;font-size:.975rem;margin-bottom:8px;line-height:1.3;" th:text="${company.companyName}">Tên Công Ty</h5>
+            <!-- Address -->
+            <div style="font-size:.8rem;color:#64748b;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:5px;">
+              <i class="fa-solid fa-location-dot" style="color:#059669;"></i>
+              <span th:text="${company.address != null ? company.address : 'Đang cập nhật'}">Cần Thơ</span>
             </div>
-
-            <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(companies)}" class="text-center py-5">
-                <i class="fa-solid fa-building text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3 fs-5">Chưa có công ty nào được đăng ký.</p>
+            <!-- CTA -->
+            <div style="display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:20px;background:rgba(5,150,105,.08);color:#059669;font-size:.8rem;font-weight:700;border:1px solid rgba(5,150,105,.2);">
+              <i class="fa-solid fa-briefcase" style="font-size:.7rem;"></i> Xem việc làm
             </div>
-        </div>
-    </section>
+          </div>
+        </a>
+      </div>
+    </div>
 
-    <!-- Footer -->
-    <footer th:replace="~{fragments :: footer}"></footer>
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(companies)}" style="text-align:center;padding:80px 24px;">
+      <div style="width:80px;height:80px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:#94a3b8;">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <h5 style="color:#0f172a;font-weight:700;margin-bottom:8px;">Chưa có công ty nào</h5>
+      <p style="color:#64748b;">Các công ty đang được cập nhật, vui lòng quay lại sau!</p>
+    </div>
+  </div>
+</section>
 
-    <!-- Scripts -->
-    <div th:replace="~{fragments :: scripts}"></div>
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
 </body>
-
 </html>

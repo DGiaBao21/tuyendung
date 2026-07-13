@@ -1,90 +1,169 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/fragments :: head('Bảng điều khiển')}"></head>
-<body>
+<body class="d-flex">
 
-<div th:replace="~{admin/fragments :: sidebar('dashboard')}"></div>
+<aside th:replace="~{admin/fragments :: sidebar('dashboard')}"></aside>
 
-<div class="admin-main">
+<div class="adm-main">
     <!-- Topbar -->
-    <div class="admin-topbar">
-        <h4 class="admin-m-0 admin-fw-bold">Bảng điều khiển</h4>
-        <div class="admin-flex admin-align-center admin-gap-1">
-            <span class="admin-text-muted">Xin chào, <strong th:text="${session.loggedInUser.fullname}">Admin</strong></span>
-            <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=Admin&background=random'}" 
-                 class="admin-avatar">
+    <div class="adm-topbar">
+        <div>
+            <div class="adm-topbar-title">Bảng điều khiển</div>
+            <div class="adm-topbar-subtitle">Tổng quan hệ thống PolyJobs</div>
+        </div>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="text-end">
+                <span class="adm-topbar-user">
+                    <strong th:text="${session.loggedInUser.fullname}">Admin</strong>
+                    Quản trị viên
+                </span>
+            </div>
+            <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=' + session.loggedInUser.fullname + '&background=6366f1&color=fff'}"
+                 class="adm-topbar-avatar" alt="avatar">
         </div>
     </div>
 
-    <!-- Stats -->
-    <div class="admin-grid-4">
-        <div class="admin-stat-card admin-bg-primary">
-            <div>
-                <h6>Tổng Người dùng</h6>
-                <h2 th:text="${totalUsers}">0</h2>
-            </div>
-            <i class="fa-solid fa-users"></i>
+    <div class="adm-content">
+        <!-- Breadcrumb -->
+        <div class="adm-breadcrumb">
+            <i class="fa-solid fa-house" style="font-size:.7rem;"></i>
+            <span class="sep">/</span>
+            <span class="current">Bảng điều khiển</span>
         </div>
-        <div class="admin-stat-card admin-bg-success">
-            <div>
-                <h6>Công ty</h6>
-                <h2 th:text="${totalCompanies}">0</h2>
-            </div>
-            <i class="fa-solid fa-building"></i>
-        </div>
-        <div class="admin-stat-card admin-bg-warning">
-            <div>
-                <h6>Việc làm</h6>
-                <h2 th:text="${totalJobs}">0</h2>
-            </div>
-            <i class="fa-solid fa-briefcase"></i>
-        </div>
-        <div class="admin-stat-card admin-bg-danger">
-            <div>
-                <h6>Hồ sơ CV</h6>
-                <h2 th:text="${totalResumes}">0</h2>
-            </div>
-            <i class="fa-solid fa-file-pdf"></i>
-        </div>
-    </div>
-    
-    <div class="admin-alert admin-alert-info mt-4">
-        <i class="fa-solid fa-circle-info"></i> 
-        <span>Chào mừng bạn đến với trang quản trị. Tại đây bạn có thể quản lý người dùng và các tin đăng tuyển dụng.</span>
-    </div>
 
-    <!-- Charts Section -->
-    <div class="admin-card mt-4" style="max-width: 500px; margin: 0 auto;">
-        <h5 class="admin-fw-bold mb-3 text-center">Tỷ lệ Người dùng</h5>
-        <canvas id="userChart"></canvas>
+        <!-- Stats Row -->
+        <div class="adm-stats">
+            <div class="adm-stat">
+                <div class="adm-stat-icon primary"><i class="fa-solid fa-users"></i></div>
+                <div>
+                    <div class="adm-stat-value" th:text="${totalUsers != null ? totalUsers : 0}">0</div>
+                    <div class="adm-stat-label">Tổng người dùng</div>
+                    <div class="adm-stat-trend up"><i class="fa-solid fa-arrow-up me-1" style="font-size:.65rem;"></i>Ứng viên + NTD</div>
+                </div>
+            </div>
+            <div class="adm-stat">
+                <div class="adm-stat-icon success"><i class="fa-solid fa-building"></i></div>
+                <div>
+                    <div class="adm-stat-value" th:text="${totalCompanies != null ? totalCompanies : 0}">0</div>
+                    <div class="adm-stat-label">Doanh nghiệp</div>
+                    <div class="adm-stat-trend up"><i class="fa-solid fa-arrow-up me-1" style="font-size:.65rem;"></i>Công ty đã đăng ký</div>
+                </div>
+            </div>
+            <div class="adm-stat">
+                <div class="adm-stat-icon warning"><i class="fa-solid fa-briefcase"></i></div>
+                <div>
+                    <div class="adm-stat-value" th:text="${totalJobs != null ? totalJobs : 0}">0</div>
+                    <div class="adm-stat-label">Tin tuyển dụng</div>
+                    <div class="adm-stat-trend up"><i class="fa-solid fa-arrow-up me-1" style="font-size:.65rem;"></i>Đang hoạt động</div>
+                </div>
+            </div>
+            <div class="adm-stat">
+                <div class="adm-stat-icon danger"><i class="fa-solid fa-file-pdf"></i></div>
+                <div>
+                    <div class="adm-stat-value" th:text="${totalResumes != null ? totalResumes : 0}">0</div>
+                    <div class="adm-stat-label">Hồ sơ CV</div>
+                    <div class="adm-stat-trend up"><i class="fa-solid fa-arrow-up me-1" style="font-size:.65rem;"></i>Đã nộp</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts + Info Row -->
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="adm-card h-100">
+                    <div class="adm-card-header">
+                        <span class="adm-card-title"><i class="fa-solid fa-chart-pie me-2" style="color: var(--adm-primary);"></i>Tỷ lệ người dùng</span>
+                    </div>
+                    <div class="adm-card-body d-flex flex-column align-items-center justify-content-center">
+                        <div class="adm-chart-wrap w-100" style="max-width:260px; height:220px;">
+                            <canvas id="userChart"></canvas>
+                        </div>
+                        <div class="d-flex gap-3 mt-3 flex-wrap justify-content-center">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:12px;height:12px;border-radius:3px;background:#6366f1;"></span>
+                                <span style="font-size:.78rem; color: var(--adm-text-muted);">Ứng viên (<span th:text="${totalCandidates}">0</span>)</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="width:12px;height:12px;border-radius:3px;background:#22c55e;"></span>
+                                <span style="font-size:.78rem; color: var(--adm-text-muted);">Nhà tuyển dụng (<span th:text="${totalEmployers}">0</span>)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="adm-card h-100">
+                    <div class="adm-card-header">
+                        <span class="adm-card-title"><i class="fa-solid fa-bolt me-2" style="color: var(--adm-warning);"></i>Thao tác nhanh</span>
+                    </div>
+                    <div class="adm-card-body">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <a href="/admin/users" class="text-decoration-none">
+                                    <div style="padding:18px; border-radius:10px; border:1.5px solid #e8eaf0; transition:all .2s; cursor:pointer;" onmouseover="this.style.borderColor='#6366f1';this.style.background='rgba(99,102,241,.04)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.background=''">
+                                        <div style="font-size:1.4rem; margin-bottom:8px;">👥</div>
+                                        <div style="font-weight:600; font-size:.875rem;">Quản lý người dùng</div>
+                                        <div style="font-size:.78rem; color:var(--adm-text-muted); margin-top:3px;">Xem &amp; duyệt tài khoản</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="/admin/jobs" class="text-decoration-none">
+                                    <div style="padding:18px; border-radius:10px; border:1.5px solid #e8eaf0; transition:all .2s; cursor:pointer;" onmouseover="this.style.borderColor='#22c55e';this.style.background='rgba(34,197,94,.04)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.background=''">
+                                        <div style="font-size:1.4rem; margin-bottom:8px;">💼</div>
+                                        <div style="font-weight:600; font-size:.875rem;">Quản lý việc làm</div>
+                                        <div style="font-size:.78rem; color:var(--adm-text-muted); margin-top:3px;">Duyệt tin tuyển dụng</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="/admin/categories" class="text-decoration-none">
+                                    <div style="padding:18px; border-radius:10px; border:1.5px solid #e8eaf0; transition:all .2s; cursor:pointer;" onmouseover="this.style.borderColor='#f59e0b';this.style.background='rgba(245,158,11,.04)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.background=''">
+                                        <div style="font-size:1.4rem; margin-bottom:8px;">🏷️</div>
+                                        <div style="font-weight:600; font-size:.875rem;">Danh mục nghề</div>
+                                        <div style="font-size:.78rem; color:var(--adm-text-muted); margin-top:3px;">Thêm / sửa danh mục</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="col-6">
+                                <a href="/" class="text-decoration-none" target="_blank">
+                                    <div style="padding:18px; border-radius:10px; border:1.5px solid #e8eaf0; transition:all .2s; cursor:pointer;" onmouseover="this.style.borderColor='#06b6d4';this.style.background='rgba(6,182,212,.04)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.background=''">
+                                        <div style="font-size:1.4rem; margin-bottom:8px;">🌐</div>
+                                        <div style="font-weight:600; font-size:.875rem;">Xem trang chủ</div>
+                                        <div style="font-size:.78rem; color:var(--adm-text-muted); margin-top:3px;">Giao diện người dùng</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
 <div th:replace="~{admin/fragments :: scripts}"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script th:inline="javascript">
     const ctx = document.getElementById('userChart').getContext('2d');
     const totalCandidates = [[${totalCandidates}]];
-    const totalEmployers = [[${totalEmployers}]];
-    
+    const totalEmployers  = [[${totalEmployers}]];
     new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
             labels: ['Ứng viên', 'Nhà tuyển dụng'],
             datasets: [{
                 data: [totalCandidates, totalEmployers],
-                backgroundColor: ['#0d6efd', '#198754'],
-                borderWidth: 1
+                backgroundColor: ['#6366f1', '#22c55e'],
+                borderWidth: 0,
+                hoverOffset: 6
             }]
         },
         options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                }
-            }
+            responsive: true, maintainAspectRatio: false,
+            cutout: '68%',
+            plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} người` } } }
         }
     });
 </script>

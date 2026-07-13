@@ -1,190 +1,188 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="~{fragments :: head('Về Chúng Tôi')}"></head>
-
+<head th:replace="~{fragments :: head('Về PolyJobs')}"></head>
 <body>
+<nav th:replace="~{fragments :: navbar('about')}"></nav>
 
-    <!-- Navbar -->
-    <nav th:replace="~{fragments :: navbar('about')}"></nav>
+<!-- ═══ HERO ═══ -->
+<section style="background: linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 40%, #0f766e 100%); padding: 80px 0 64px; position:relative; overflow:hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.03%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  <div class="container text-center" style="position:relative;z-index:1;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 18px;margin-bottom:20px;font-size:.85rem;color:rgba(255,255,255,.85);">
+      <i class="fa-solid fa-water" style="color:#34d399;"></i> Nền tảng tuyển dụng miền Tây
+    </div>
+    <h1 style="font-size:2.8rem;font-weight:800;color:#fff;margin-bottom:14px;line-height:1.2;">Về <span style="color:#38bdf8;">PolyJobs</span></h1>
+    <p style="color:rgba(255,255,255,.75);font-size:1.1rem;max-width:580px;margin:0 auto 36px;line-height:1.7;">Sứ mệnh kết nối nhân tài với doanh nghiệp tại 13 tỉnh Đồng bằng sông Cửu Long</p>
 
-    <!-- ═══ PAGE HEADER ═══ -->
-    <section class="page-header" id="aboutHeader">
-        <div class="container text-center">
-            <h1 class="page-header-title">Về PolyJobs</h1>
-            <p class="page-header-subtitle">Nền tảng tuyển dụng hàng đầu khu vực Đồng bằng sông Cửu Long</p>
+    <!-- Stats -->
+    <div style="display:flex;justify-content:center;gap:32px;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;font-weight:800;color:#fff;">13</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.6);">Tỉnh thành</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.15);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;font-weight:800;color:#38bdf8;">500+</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.6);">Việc làm</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.15);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;font-weight:800;color:#34d399;">200+</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.6);">Doanh nghiệp</div>
+      </div>
+      <div style="width:1px;background:rgba(255,255,255,.15);"></div>
+      <div style="text-align:center;">
+        <div style="font-size:2.2rem;font-weight:800;color:#fbbf24;">1000+</div>
+        <div style="font-size:.85rem;color:rgba(255,255,255,.6);">Ứng viên</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ OUR STORY ═══ -->
+<section style="padding:72px 0;background:#fff;">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6">
+        <div style="display:inline-block;padding:4px 14px;background:rgba(14,165,233,.08);color:#0369a1;border-radius:20px;font-size:.8rem;font-weight:700;margin-bottom:16px;">
+          <i class="fa-solid fa-heart me-1" style="color:#0ea5e9;"></i> Câu chuyện của chúng tôi
         </div>
-    </section>
-
-    <!-- ═══ GIỚI THIỆU ═══ -->
-    <section class="about-section" id="aboutIntro">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-7">
-                    <h2 class="section-title">Câu Chuyện Của Chúng Tôi</h2>
-                    <p class="about-intro mt-3">
-                        <strong>PolyJobs</strong> ra đời với sứ mệnh kết nối nhân tài với doanh nghiệp tại
-                        <strong>13 tỉnh miền Tây Nam Bộ</strong> – vùng đất trù phú của Đồng bằng sông Cửu Long.
-                    </p>
-                    <p class="about-intro">
-                        Chúng tôi hiểu rằng miền Tây không chỉ là vùng nông nghiệp, thủy sản mà còn đang
-                        phát triển mạnh mẽ về công nghệ, du lịch, giáo dục và nhiều ngành nghề khác.
-                        PolyJobs giúp các ứng viên tìm được công việc phù hợp ngay tại quê nhà,
-                        đồng thời hỗ trợ doanh nghiệp tìm kiếm nhân tài địa phương chất lượng.
-                    </p>
-                    <p class="about-intro">
-                        Với giao diện thân thiện, tìm kiếm thông minh theo tỉnh thành và ngành nghề,
-                        PolyJobs cam kết mang đến trải nghiệm tuyển dụng tốt nhất cho cả ứng viên
-                        và nhà tuyển dụng khu vực miền Tây.
-                    </p>
-                </div>
-                <div class="col-lg-5">
-                    <div style="background: var(--gradient-primary); border-radius: var(--radius-xl); padding: 40px; text-align: center; color: #fff;">
-                        <i class="fa-solid fa-water" style="font-size: 3rem; margin-bottom: 16px;"></i>
-                        <h3 style="font-weight: 800; margin-bottom: 8px;">PolyJobs</h3>
-                        <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
-                            Kết nối cơ hội – Phát triển miền Tây
-                        </p>
-                        <div class="d-flex justify-content-center gap-4 mt-4">
-                            <div>
-                                <div style="font-size: 1.8rem; font-weight: 800;">13</div>
-                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Tỉnh thành</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.8rem; font-weight: 800;">500+</div>
-                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Việc làm</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 1.8rem; font-weight: 800;">200+</div>
-                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.7);">Công ty</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <h2 style="font-size:2rem;font-weight:800;color:#0f172a;margin-bottom:20px;line-height:1.3;">Kết nối Nhân tài – Phát triển Miền Tây</h2>
+        <p style="color:#475569;line-height:1.8;margin-bottom:16px;">
+          <strong style="color:#0ea5e9;">PolyJobs</strong> ra đời với sứ mệnh kết nối nhân tài với doanh nghiệp tại <strong>13 tỉnh miền Tây Nam Bộ</strong> – vùng đất trù phú của Đồng bằng sông Cửu Long.
+        </p>
+        <p style="color:#475569;line-height:1.8;margin-bottom:16px;">
+          Chúng tôi hiểu rằng miền Tây không chỉ là vùng nông nghiệp, thủy sản mà còn đang phát triển mạnh mẽ về công nghệ, du lịch, giáo dục và nhiều ngành nghề khác. PolyJobs giúp các ứng viên tìm được công việc phù hợp ngay tại quê nhà.
+        </p>
+        <p style="color:#475569;line-height:1.8;">
+          Với giao diện thân thiện, tìm kiếm thông minh theo tỉnh thành và ngành nghề, PolyJobs cam kết mang đến trải nghiệm tuyển dụng tốt nhất cho cả ứng viên và nhà tuyển dụng.
+        </p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:28px;">
+          <a href="/jobs" style="display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;box-shadow:0 4px 14px rgba(14,165,233,.3);">
+            <i class="fa-solid fa-briefcase"></i> Tìm việc ngay
+          </a>
+          <a href="/companies" style="display:inline-flex;align-items:center;gap:8px;padding:11px 24px;background:#fff;color:#0f172a;border-radius:10px;text-decoration:none;font-weight:700;border:1.5px solid #e2e8f0;">
+            <i class="fa-solid fa-building"></i> Xem công ty
+          </a>
         </div>
-    </section>
-
-    <!-- ═══ TẠI SAO CHỌN POLYJOBS ═══ -->
-    <section class="about-section" style="background: var(--primary-50);" id="whyPolyJobs">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2 class="section-title" style="display: block; text-align: center; padding-left: 0;">
-                    Tại Sao Chọn PolyJobs?
-                </h2>
-                <p class="section-subtitle" style="padding-left: 0;">
-                    Những giá trị chúng tôi mang lại
-                </p>
+      </div>
+      <div class="col-lg-6">
+        <!-- Visual card -->
+        <div style="background:linear-gradient(135deg,#0c4a6e,#0f766e);border-radius:20px;padding:40px;color:#fff;text-align:center;">
+          <i class="fa-solid fa-water" style="font-size:3.5rem;margin-bottom:20px;opacity:.9;"></i>
+          <h3 style="font-weight:800;font-size:1.6rem;margin-bottom:8px;">PolyJobs</h3>
+          <p style="color:rgba(255,255,255,.75);margin-bottom:28px;">Kết nối cơ hội – Phát triển Miền Tây</p>
+          <div class="row g-3">
+            <div class="col-6">
+              <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+                <div style="font-size:1.5rem;font-weight:800;">13</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:4px;">Tỉnh thành</div>
+              </div>
             </div>
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-3">
-                    <div class="about-feature-card fade-in-up">
-                        <div class="about-feature-icon" style="background: #eff6ff; color: #3b82f6;">
-                            <i class="fa-solid fa-bullseye"></i>
-                        </div>
-                        <div class="about-feature-title">Tập Trung Miền Tây</div>
-                        <div class="about-feature-desc">
-                            Chuyên sâu thị trường lao động 13 tỉnh ĐBSCL, hiểu rõ nhu cầu địa phương
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="about-feature-card fade-in-up">
-                        <div class="about-feature-icon" style="background: #ecfdf5; color: #059669;">
-                            <i class="fa-solid fa-handshake"></i>
-                        </div>
-                        <div class="about-feature-title">Kết Nối Nhanh Chóng</div>
-                        <div class="about-feature-desc">
-                            Ứng viên và nhà tuyển dụng dễ dàng tìm thấy nhau chỉ trong vài bước
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="about-feature-card fade-in-up">
-                        <div class="about-feature-icon" style="background: #fef3c7; color: #f59e0b;">
-                            <i class="fa-solid fa-shield-halved"></i>
-                        </div>
-                        <div class="about-feature-title">Tin Cậy & An Toàn</div>
-                        <div class="about-feature-desc">
-                            Thông tin việc làm được kiểm duyệt, đảm bảo uy tín cho cả hai bên
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="about-feature-card fade-in-up">
-                        <div class="about-feature-icon" style="background: #fdf4ff; color: #a855f7;">
-                            <i class="fa-solid fa-bolt"></i>
-                        </div>
-                        <div class="about-feature-title">Hoàn Toàn Miễn Phí</div>
-                        <div class="about-feature-desc">
-                            Ứng viên tìm việc và ứng tuyển hoàn toàn miễn phí, không giới hạn
-                        </div>
-                    </div>
-                </div>
+            <div class="col-6">
+              <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+                <div style="font-size:1.5rem;font-weight:800;color:#34d399;">500+</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:4px;">Việc làm</div>
+              </div>
             </div>
+            <div class="col-6">
+              <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+                <div style="font-size:1.5rem;font-weight:800;color:#38bdf8;">200+</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:4px;">Doanh nghiệp</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div style="background:rgba(255,255,255,.1);border-radius:12px;padding:16px;">
+                <div style="font-size:1.5rem;font-weight:800;color:#fbbf24;">1000+</div>
+                <div style="font-size:.78rem;color:rgba(255,255,255,.65);margin-top:4px;">Ứng viên</div>
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- ═══ 13 TỈNH MIỀN TÂY ═══ -->
-    <section class="about-section" id="provinces">
-        <div class="container">
-            <div class="section-header text-center">
-                <h2 class="section-title" style="display: block; text-align: center; padding-left: 0;">
-                    <i class="fa-solid fa-map-location-dot me-2"></i> 13 Tỉnh Miền Tây Nam Bộ
-                </h2>
-                <p class="section-subtitle" style="padding-left: 0;">
-                    Phủ sóng toàn bộ khu vực Đồng bằng sông Cửu Long
-                </p>
-            </div>
-            <div class="province-grid" style="max-width: 900px; margin: 0 auto;">
-                <a th:href="@{/jobs(location='An Giang')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> An Giang
-                </a>
-                <a th:href="@{/jobs(location='Bạc Liêu')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Bạc Liêu
-                </a>
-                <a th:href="@{/jobs(location='Bến Tre')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Bến Tre
-                </a>
-                <a th:href="@{/jobs(location='Cà Mau')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Cà Mau
-                </a>
-                <a th:href="@{/jobs(location='Cần Thơ')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Cần Thơ
-                </a>
-                <a th:href="@{/jobs(location='Đồng Tháp')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Đồng Tháp
-                </a>
-                <a th:href="@{/jobs(location='Hậu Giang')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Hậu Giang
-                </a>
-                <a th:href="@{/jobs(location='Kiên Giang')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Kiên Giang
-                </a>
-                <a th:href="@{/jobs(location='Long An')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Long An
-                </a>
-                <a th:href="@{/jobs(location='Sóc Trăng')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Sóc Trăng
-                </a>
-                <a th:href="@{/jobs(location='Tiền Giang')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Tiền Giang
-                </a>
-                <a th:href="@{/jobs(location='Trà Vinh')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Trà Vinh
-                </a>
-                <a th:href="@{/jobs(location='Vĩnh Long')}" class="province-item fade-in-up">
-                    <i class="fa-solid fa-location-dot"></i> Vĩnh Long
-                </a>
-            </div>
+<!-- ═══ TẠI SAO CHỌN ═══ -->
+<section style="padding:72px 0;background:#f8fafc;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <div style="display:inline-block;padding:4px 14px;background:rgba(5,150,105,.08);color:#065f46;border-radius:20px;font-size:.8rem;font-weight:700;margin-bottom:14px;">
+        <i class="fa-solid fa-star me-1" style="color:#059669;"></i> Điểm nổi bật
+      </div>
+      <h2 style="font-size:2rem;font-weight:800;color:#0f172a;">Tại Sao Chọn PolyJobs?</h2>
+      <p style="color:#64748b;margin-top:8px;">Những giá trị chúng tôi mang lại</p>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-3" th:each="item,stat : ${ {0,1,2,3} }">
+        <!-- Card 1: Địa phương -->
+        <div th:if="${stat.index == 0}" style="background:#fff;border-radius:16px;border:1.5px solid #e8eaf0;padding:28px;text-align:center;transition:all .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#0ea5e9';this.style.boxShadow='0 8px 24px rgba(14,165,233,.1)'" onmouseout="this.style.transform='';this.style.borderColor='#e8eaf0';this.style.boxShadow=''">
+          <div style="width:56px;height:56px;background:rgba(14,165,233,.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:#0ea5e9;"><i class="fa-solid fa-map-location-dot"></i></div>
+          <h5 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Chuyên biệt Miền Tây</h5>
+          <p style="font-size:.85rem;color:#64748b;line-height:1.6;">Tập trung vào 13 tỉnh ĐBSCL. Hiểu rõ nhu cầu địa phương hơn bất kỳ nền tảng nào.</p>
         </div>
-    </section>
+        <!-- Card 2: Miễn phí -->
+        <div th:if="${stat.index == 1}" style="background:#fff;border-radius:16px;border:1.5px solid #e8eaf0;padding:28px;text-align:center;transition:all .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#059669';this.style.boxShadow='0 8px 24px rgba(5,150,105,.1)'" onmouseout="this.style.transform='';this.style.borderColor='#e8eaf0';this.style.boxShadow=''">
+          <div style="width:56px;height:56px;background:rgba(5,150,105,.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:#059669;"><i class="fa-solid fa-gift"></i></div>
+          <h5 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Hoàn toàn miễn phí</h5>
+          <p style="font-size:.85rem;color:#64748b;line-height:1.6;">Đăng ký, tìm việc, nộp hồ sơ – tất cả đều miễn phí cho ứng viên 100%.</p>
+        </div>
+        <!-- Card 3: Nhanh -->
+        <div th:if="${stat.index == 2}" style="background:#fff;border-radius:16px;border:1.5px solid #e8eaf0;padding:28px;text-align:center;transition:all .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#8b5cf6';this.style.boxShadow='0 8px 24px rgba(139,92,246,.1)'" onmouseout="this.style.transform='';this.style.borderColor='#e8eaf0';this.style.boxShadow=''">
+          <div style="width:56px;height:56px;background:rgba(139,92,246,.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:#8b5cf6;"><i class="fa-solid fa-bolt"></i></div>
+          <h5 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Kết nối nhanh chóng</h5>
+          <p style="font-size:.85rem;color:#64748b;line-height:1.6;">Nhà tuyển dụng nhận hồ sơ ngay lập tức. Ứng viên được phản hồi trong vài ngày.</p>
+        </div>
+        <!-- Card 4: Bảo mật -->
+        <div th:if="${stat.index == 3}" style="background:#fff;border-radius:16px;border:1.5px solid #e8eaf0;padding:28px;text-align:center;transition:all .25s;" onmouseover="this.style.transform='translateY(-4px)';this.style.borderColor='#f59e0b';this.style.boxShadow='0 8px 24px rgba(245,158,11,.1)'" onmouseout="this.style.transform='';this.style.borderColor='#e8eaf0';this.style.boxShadow=''">
+          <div style="width:56px;height:56px;background:rgba(245,158,11,.1);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;color:#f59e0b;"><i class="fa-solid fa-shield-halved"></i></div>
+          <h5 style="font-weight:700;color:#0f172a;margin-bottom:8px;">Bảo mật thông tin</h5>
+          <p style="font-size:.85rem;color:#64748b;line-height:1.6;">Thông tin cá nhân được bảo vệ nghiêm ngặt. Chỉ chia sẻ với nhà tuyển dụng khi bạn đồng ý.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer th:replace="~{fragments :: footer}"></footer>
+<!-- ═══ 13 PROVINCES ═══ -->
+<section style="padding:72px 0;background:#fff;">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 style="font-size:2rem;font-weight:800;color:#0f172a;margin-bottom:8px;">13 Tỉnh Thành Miền Tây</h2>
+      <p style="color:#64748b;">PolyJobs phủ sóng toàn bộ Đồng bằng sông Cửu Long</p>
+    </div>
+    <div class="row g-3 justify-content-center">
+      <th:block th:each="province : ${ {'An Giang','Bạc Liêu','Bến Tre','Cà Mau','Cần Thơ','Đồng Tháp','Hậu Giang','Kiên Giang','Long An','Sóc Trăng','Tiền Giang','Trà Vinh','Vĩnh Long'} }">
+        <div class="col-6 col-md-4 col-lg-3 col-xl-2">
+          <a th:href="@{/jobs(location=${province})}" style="display:block;text-align:center;padding:14px;background:#f8fafc;border:1.5px solid #e8eaf0;border-radius:12px;text-decoration:none;color:#0f172a;font-size:.82rem;font-weight:600;transition:all .2s;" onmouseover="this.style.background='rgba(14,165,233,.06)';this.style.borderColor='#0ea5e9';this.style.color='#0369a1';" onmouseout="this.style.background='#f8fafc';this.style.borderColor='#e8eaf0';this.style.color='#0f172a';">
+            <i class="fa-solid fa-map-pin" style="color:#0ea5e9;margin-bottom:6px;font-size:.9rem;display:block;"></i>
+            <span th:text="${province}">Tỉnh</span>
+          </a>
+        </div>
+      </th:block>
+    </div>
+  </div>
+</section>
 
-    <!-- Scripts -->
-    <div th:replace="~{fragments :: scripts}"></div>
+<!-- ═══ CTA ═══ -->
+<section style="background:linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 40%, #0f766e 100%); padding:72px 0; text-align:center; position:relative; overflow:hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.03%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <h2 style="font-size:2.2rem;font-weight:800;color:#fff;margin-bottom:12px;">Sẵn sàng bắt đầu chưa?</h2>
+    <p style="color:rgba(255,255,255,.75);font-size:1rem;margin-bottom:32px;">Tạo tài khoản miễn phí và khám phá cơ hội nghề nghiệp ngay hôm nay</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/register" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:#fff;color:#0c4a6e;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem;box-shadow:0 4px 16px rgba(0,0,0,.2);">
+        <i class="fa-solid fa-user-plus"></i> Đăng ký miễn phí
+      </a>
+      <a href="/jobs" style="display:inline-flex;align-items:center;gap:8px;padding:12px 28px;background:rgba(255,255,255,.12);color:#fff;border-radius:10px;text-decoration:none;font-weight:700;font-size:.95rem;border:1.5px solid rgba(255,255,255,.25);">
+        <i class="fa-solid fa-magnifying-glass"></i> Tìm việc ngay
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
 </body>
-
 </html>

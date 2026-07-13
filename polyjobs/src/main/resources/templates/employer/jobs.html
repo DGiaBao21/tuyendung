@@ -2,79 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Quản lý tin tuyển dụng')}"></head>
 <body>
-    <nav th:replace="~{fragments :: navbar('employer')}"></nav>
+<nav th:replace="~{fragments :: navbar('employer')}"></nav>
 
-    <div class="container py-5">
-        <div class="row mb-4 align-items-center">
-            <div class="col-md-6">
-                <h2 class="mb-0"><i class="fa-solid fa-briefcase me-2 text-primary"></i> Quản lý tin tuyển dụng</h2>
+<div style="background:#f8f9fc; min-height:calc(100vh - 72px); padding: 32px 0;">
+    <div class="container-lg">
+
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 style="font-weight:800; margin:0; color:#1e293b;">Quản lý tin tuyển dụng</h4>
+                <p style="color:#64748b; font-size:.85rem; margin:4px 0 0;">Tất cả tin đăng tuyển của bạn</p>
             </div>
-            <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <a th:href="@{/employer/job/add}" class="btn btn-primary"><i class="fa-solid fa-plus me-2"></i> Đăng tin mới</a>
-            </div>
+            <a th:href="@{/employer/job/add}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;font-weight:600;font-size:.875rem;text-decoration:none;box-shadow:0 4px 14px rgba(99,102,241,.35);transition:all .2s;" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">
+                <i class="fa-solid fa-plus"></i> Đăng tin mới
+            </a>
         </div>
 
-        <div class="alert alert-success" th:if="${success}">
-            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+        <!-- Alerts -->
+        <div th:if="${success}" style="background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#15803d;border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
         </div>
-        <div class="alert alert-danger" th:if="${error}">
-            <i class="fa-solid fa-triangle-exclamation me-2"></i><span th:text="${error}"></span>
+        <div th:if="${error}" style="background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#b91c1c;border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> <span th:text="${error}"></span>
         </div>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Tin tuyển dụng</th>
-                                <th>Danh mục</th>
-                                <th>Ngày hết hạn</th>
-                                <th>Trạng thái</th>
-                                <th class="text-end">Thao tác</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="job : ${jobs}">
-                                <td>
-                                    <a th:href="@{/job/{id}(id=${job.id})}" target="_blank" class="fw-bold text-decoration-none" th:text="${job.title}">Tên công việc</a>
-                                    <div class="small text-muted" th:text="${job.location}">Địa điểm</div>
-                                </td>
-                                <td th:text="${job.category != null ? job.category.name : 'N/A'}">Danh mục</td>
-                                <td th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</td>
-                                <td>
-                                    <span class="badge bg-success" th:if="${job.status}">Đang mở</span>
-                                    <span class="badge bg-secondary" th:unless="${job.status}">Đã đóng</span>
-                                </td>
-                                <td class="text-end">
-                                    <a th:href="@{/employer/job/edit/{id}(id=${job.id})}" class="btn btn-sm btn-outline-primary" title="Sửa">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </a>
-                                    <form th:action="@{/employer/job/toggle-status}" method="post" class="d-inline">
-                                        <input type="hidden" name="id" th:value="${job.id}">
-                                        <button type="submit" class="btn btn-sm btn-outline-warning" th:title="${job.status ? 'Đóng tin' : 'Mở lại tin'}">
-                                            <i class="fa-solid" th:classappend="${job.status ? 'fa-lock' : 'fa-lock-open'}"></i>
-                                        </button>
-                                    </form>
-                                    <a th:href="@{/employer/applications/{jobId}(jobId=${job.id})}" class="btn btn-sm btn-outline-info" title="Xem ứng viên">
-                                        <i class="fa-solid fa-users"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                            <tr th:if="${jobs.isEmpty()}">
-                                <td colspan="5" class="text-center py-4 text-muted">
-                                    <i class="fa-solid fa-box-open fs-2 mb-2 d-block"></i>
-                                    Bạn chưa đăng tin tuyển dụng nào.
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <!-- Job Cards -->
+        <div th:if="${!jobs.isEmpty()}" class="d-flex flex-column gap-3">
+            <div th:each="job : ${jobs}"
+                 style="background:#fff;border-radius:14px;border:1.5px solid #e8eaf0;padding:20px 24px;display:flex;align-items:center;gap:20px;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.04);"
+                 onmouseover="this.style.borderColor='#6366f1';this.style.boxShadow='0 4px 20px rgba(99,102,241,.12)'"
+                 onmouseout="this.style.borderColor='#e8eaf0';this.style.boxShadow='0 1px 4px rgba(0,0,0,.04)'">
+
+                <!-- Status dot -->
+                <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;"
+                     th:style="${job.status} ? 'background:#22c55e;box-shadow:0 0 6px rgba(34,197,94,.5);' : 'background:#94a3b8;'"></div>
+
+                <!-- Info -->
+                <div style="flex:1;min-width:0;">
+                    <a th:href="@{/job/{id}(id=${job.id})}" target="_blank"
+                       style="font-weight:700;font-size:.975rem;color:#1e293b;text-decoration:none;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" th:text="${job.title}">Tiêu đề</a>
+                    <div style="display:flex;align-items:center;gap:16px;margin-top:6px;flex-wrap:wrap;">
+                        <span style="font-size:.78rem;color:#64748b;"><i class="fa-solid fa-location-dot me-1" style="color:#6366f1;"></i><span th:text="${job.location}"></span></span>
+                        <span style="font-size:.78rem;color:#64748b;" th:if="${job.category != null}"><i class="fa-solid fa-layer-group me-1" style="color:#06b6d4;"></i><span th:text="${job.category.name}"></span></span>
+                        <span style="font-size:.78rem;color:#64748b;"><i class="fa-regular fa-calendar me-1" style="color:#f59e0b;"></i>Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}"></span></span>
+                    </div>
+                </div>
+
+                <!-- Status badge -->
+                <div style="flex-shrink:0;">
+                    <span th:if="${job.status}" style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;">● Đang mở</span>
+                    <span th:unless="${job.status}" style="display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;background:#f1f5f9;color:#64748b;">● Đã đóng</span>
+                </div>
+
+                <!-- Actions -->
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                    <a th:href="@{/employer/job/edit/{id}(id=${job.id})}"
+                       style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;border:1.5px solid #e8eaf0;font-size:.8rem;font-weight:600;color:#64748b;text-decoration:none;transition:all .2s;"
+                       onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1';"
+                       onmouseout="this.style.borderColor='#e8eaf0';this.style.color='#64748b';">
+                        <i class="fa-solid fa-pen"></i> Sửa
+                    </a>
+                    <form th:action="@{/employer/job/toggle-status}" method="post" class="d-inline">
+                        <input type="hidden" name="id" th:value="${job.id}">
+                        <button type="submit" style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer;border:1.5px solid #e8eaf0;background:transparent;color:#64748b;transition:all .2s;"
+                                onmouseover="this.style.borderColor='#f59e0b';this.style.color='#d97706';"
+                                onmouseout="this.style.borderColor='#e8eaf0';this.style.color='#64748b';">
+                            <i class="fa-solid" th:classappend="${job.status} ? 'fa-lock' : 'fa-lock-open'"></i>
+                            <span th:text="${job.status} ? 'Đóng tin' : 'Mở lại'"></span>
+                        </button>
+                    </form>
+                    <a th:href="@{/employer/applications/{jobId}(jobId=${job.id})}"
+                       style="display:inline-flex;align-items:center;gap:5px;padding:7px 13px;border-radius:8px;background:rgba(99,102,241,.08);border:1.5px solid rgba(99,102,241,.2);font-size:.8rem;font-weight:600;color:#6366f1;text-decoration:none;transition:all .2s;"
+                       onmouseover="this.style.background='#6366f1';this.style.color='#fff';"
+                       onmouseout="this.style.background='rgba(99,102,241,.08)';this.style.color='#6366f1';">
+                        <i class="fa-solid fa-users"></i> Ứng viên
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
 
-    <footer th:replace="~{fragments :: footer}"></footer>
-    <div th:replace="~{fragments :: scripts}"></div>
+        <!-- Empty state -->
+        <div th:if="${jobs.isEmpty()}" style="background:#fff;border-radius:16px;border:1.5px dashed #d1d5db;padding:60px 24px;text-align:center;">
+            <div style="width:72px;height:72px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.8rem;color:#94a3b8;">
+                <i class="fa-solid fa-briefcase"></i>
+            </div>
+            <h5 style="color:#1e293b;font-weight:700;margin-bottom:6px;">Chưa có tin tuyển dụng nào</h5>
+            <p style="color:#64748b;font-size:.875rem;margin-bottom:20px;">Bắt đầu bằng cách đăng tin tuyển dụng đầu tiên của bạn!</p>
+            <a th:href="@{/employer/job/add}" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;background:#6366f1;color:#fff;font-weight:600;font-size:.875rem;text-decoration:none;">
+                <i class="fa-solid fa-plus"></i> Đăng tin ngay
+            </a>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
 </body>
 </html>

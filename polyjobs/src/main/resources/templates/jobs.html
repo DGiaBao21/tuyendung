@@ -1,162 +1,159 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{fragments :: head('Tìm Việc Làm Miền Tây')}"></head>
-
 <body>
+<nav th:replace="~{fragments :: navbar('jobs')}"></nav>
 
-    <!-- Navbar -->
-    <nav th:replace="~{fragments :: navbar('jobs')}"></nav>
+<!-- ═══ HERO SEARCH BANNER ═══ -->
+<section style="background: linear-gradient(135deg, #0c4a6e 0%, #1e3a5f 40%, #0f766e 100%); padding: 60px 0 48px; position: relative; overflow: hidden;">
+  <div style="position:absolute;inset:0;background:url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22%3E%3Cg fill=%22%23ffffff%22 fill-opacity=%220.03%22%3E%3Ccircle cx=%2230%22 cy=%2230%22 r=%224%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+  <div class="container" style="position:relative;z-index:1;">
+    <h1 style="font-size:2.2rem;font-weight:800;color:#fff;margin-bottom:8px;text-align:center;">
+      <i class="fa-solid fa-magnifying-glass me-2" style="color:#38bdf8;"></i> Tìm Việc Làm
+    </h1>
+    <p style="text-align:center;color:rgba(255,255,255,.7);font-size:1rem;margin-bottom:32px;">
+      Khám phá cơ hội nghề nghiệp tại 13 tỉnh Đồng bằng sông Cửu Long
+    </p>
 
-    <!-- ═══ PAGE HEADER + SEARCH ═══ -->
-    <section class="page-header" id="jobsHeader">
-        <div class="container">
-            <h1 class="page-header-title">
-                <i class="fa-solid fa-magnifying-glass me-2"></i> Tìm Việc Làm
-            </h1>
-            <p class="page-header-subtitle">Khám phá cơ hội nghề nghiệp tại 13 tỉnh Đồng bằng sông Cửu Long</p>
-
-            <!-- Search Filter Bar -->
-            <form class="search-filter-bar" action="/jobs" method="get" id="searchFilterForm">
-                <div class="row g-2 mb-2">
-                    <div class="col-md-6">
-                        <input type="text" class="form-control" name="keyword"
-                            placeholder="Tên công việc, vị trí, công ty..."
-                            th:value="${keyword}" id="searchKeyword">
-                    </div>
-                    <div class="col-md-6">
-                        <select class="form-select" name="location" id="searchLocation">
-                        <option value="">Tất cả tỉnh thành</option>
-                        <option value="An Giang" th:selected="${location == 'An Giang'}">An Giang</option>
-                        <option value="Bạc Liêu" th:selected="${location == 'Bạc Liêu'}">Bạc Liêu</option>
-                        <option value="Bến Tre" th:selected="${location == 'Bến Tre'}">Bến Tre</option>
-                        <option value="Cà Mau" th:selected="${location == 'Cà Mau'}">Cà Mau</option>
-                        <option value="Cần Thơ" th:selected="${location == 'Cần Thơ'}">Cần Thơ</option>
-                        <option value="Đồng Tháp" th:selected="${location == 'Đồng Tháp'}">Đồng Tháp</option>
-                        <option value="Hậu Giang" th:selected="${location == 'Hậu Giang'}">Hậu Giang</option>
-                        <option value="Kiên Giang" th:selected="${location == 'Kiên Giang'}">Kiên Giang</option>
-                        <option value="Long An" th:selected="${location == 'Long An'}">Long An</option>
-                        <option value="Sóc Trăng" th:selected="${location == 'Sóc Trăng'}">Sóc Trăng</option>
-                        <option value="Tiền Giang" th:selected="${location == 'Tiền Giang'}">Tiền Giang</option>
-                        <option value="Trà Vinh" th:selected="${location == 'Trà Vinh'}">Trà Vinh</option>
-                        <option value="Vĩnh Long" th:selected="${location == 'Vĩnh Long'}">Vĩnh Long</option>
-                    </select>
-                    </div>
-                </div>
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <select class="form-select" name="categoryId" id="searchCategory">
-                            <option value="">Tất cả ngành nghề</option>
-                            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <select class="form-select" name="salary" id="searchSalary">
-                            <option value="">Mọi mức lương</option>
-                            <option value="Thỏa thuận" th:selected="${salary == 'Thỏa thuận'}">Thỏa thuận</option>
-                            <option value="Dưới 10" th:selected="${salary == 'Dưới 10'}">Dưới 10 triệu</option>
-                            <option value="10 - 15" th:selected="${salary == '10 - 15'}">10 - 15 triệu</option>
-                            <option value="15 - 20" th:selected="${salary == '15 - 20'}">15 - 20 triệu</option>
-                            <option value="Trên 20" th:selected="${salary == 'Trên 20'}">Trên 20 triệu</option>
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <button class="btn btn-search w-100" type="submit">
-                            <i class="fa-solid fa-magnifying-glass me-1"></i> TÌM KIẾM
-                        </button>
-                    </div>
-                </div>
-            </form>
+    <!-- Search Bar -->
+    <form action="/jobs" method="get" style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:20px 24px;">
+      <div class="row g-2 mb-2">
+        <div class="col-md-6">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:10px;overflow:hidden;">
+            <span style="padding:11px 14px;color:#94a3b8;background:#f8fafc;border-right:1px solid #e2e8f0;"><i class="fa-solid fa-search"></i></span>
+            <input type="text" name="keyword" th:value="${keyword}" placeholder="Tên công việc, vị trí, công ty..." style="border:none;outline:none;padding:11px 14px;font-size:.875rem;flex:1;color:#0f172a;font-family:inherit;">
+          </div>
         </div>
-    </section>
-
-    <!-- ═══ JOB RESULTS ═══ -->
-    <section class="section-container" id="jobResults">
-        <div class="container">
-
-            <!-- Search Results Info -->
-            <div class="search-results-info" th:if="${totalResults != null}">
-                <i class="fa-solid fa-list me-1"></i>
-                Tìm thấy <strong th:text="${totalResults}">0</strong> việc làm
-                <span th:if="${keyword != null && !keyword.isEmpty()}">
-                    cho "<strong th:text="${keyword}">keyword</strong>"
-                </span>
-                <span th:if="${location != null && !location.isEmpty()}">
-                    tại <strong th:text="${location}">location</strong>
-                </span>
-                <span th:if="${salary != null && !salary.isEmpty()}">
-                    (Lương: <strong th:text="${salary}">salary</strong>)
-                </span>
-            </div>
-
-            <!-- Job Cards Grid -->
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
-                    <div class="job-card fade-in-up">
-                        <div class="job-card-header">
-                            <div class="company-logo-placeholder"
-                                th:text="${job.company != null && job.company.companyName != null ? job.company.companyName.substring(0,1) : 'C'}">
-                                C
-                            </div>
-                            <div class="job-card-info">
-                                <a th:href="@{/job/{id}(id=${job.id})}">
-                                    <div class="job-title" th:text="${job.title}">Lập trình viên Java</div>
-                                </a>
-                                <div class="job-company"
-                                    th:text="${job.company != null ? job.company.companyName : 'Đang cập nhật'}">
-                                    Công ty ABC</div>
-                            </div>
-                        </div>
-
-                        <div class="job-salary">
-                            <i class="fa-solid fa-money-bill-wave"></i>
-                            <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}">15 - 20 Triệu</span>
-                        </div>
-
-                        <div class="job-tags">
-                            <span class="job-tag location">
-                                <i class="fa-solid fa-location-dot"></i>
-                                <span th:text="${job.location}">Cần Thơ</span>
-                            </span>
-                            <span class="job-tag experience" th:if="${job.experience != null}">
-                                <i class="fa-solid fa-briefcase"></i>
-                                <span th:text="${job.experience}">1 năm</span>
-                            </span>
-                            <span class="job-tag work-type" th:if="${job.workingType != null}">
-                                <i class="fa-solid fa-clock"></i>
-                                <span th:text="${job.workingType}">Toàn thời gian</span>
-                            </span>
-                        </div>
-
-                        <p class="job-description-preview" th:text="${job.description}">
-                            Mô tả công việc...
-                        </p>
-
-                        <div class="job-card-footer">
-                            <span class="job-deadline">
-                                <i class="fa-regular fa-calendar"></i>
-                                Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}">30/06/2026</span>
-                            </span>
-                            <a th:href="@{/job/{id}(id=${job.id})}" class="btn-view-detail">Xem chi tiết</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Empty state -->
-            <div th:if="${#lists.isEmpty(jobs)}" class="text-center py-5">
-                <i class="fa-solid fa-search text-muted" style="font-size: 3rem;"></i>
-                <p class="text-muted mt-3 fs-5">Không tìm thấy việc làm phù hợp.</p>
-                <a th:href="@{/jobs}" class="btn btn-outline-primary mt-2">Xem tất cả việc làm</a>
-            </div>
+        <div class="col-md-6">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:10px;overflow:hidden;">
+            <span style="padding:11px 14px;color:#94a3b8;background:#f8fafc;border-right:1px solid #e2e8f0;"><i class="fa-solid fa-location-dot"></i></span>
+            <select name="location" style="border:none;outline:none;padding:11px 14px;font-size:.875rem;flex:1;color:#0f172a;font-family:inherit;background:#fff;">
+              <option value="">Tất cả tỉnh thành</option>
+              <option th:each="loc : ${ {'An Giang','Bạc Liêu','Bến Tre','Cà Mau','Cần Thơ','Đồng Tháp','Hậu Giang','Kiên Giang','Long An','Sóc Trăng','Tiền Giang','Trà Vinh','Vĩnh Long'} }" th:value="${loc}" th:text="${loc}" th:selected="${location == loc}"></option>
+            </select>
+          </div>
         </div>
-    </section>
+      </div>
+      <div class="row g-2">
+        <div class="col-md-4">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:10px;overflow:hidden;">
+            <span style="padding:11px 14px;color:#94a3b8;background:#f8fafc;border-right:1px solid #e2e8f0;"><i class="fa-solid fa-layer-group"></i></span>
+            <select name="categoryId" style="border:none;outline:none;padding:11px 14px;font-size:.875rem;flex:1;color:#0f172a;font-family:inherit;background:#fff;">
+              <option value="">Tất cả ngành nghề</option>
+              <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}" th:selected="${categoryId == cat.id}"></option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div style="display:flex;align-items:center;background:#fff;border-radius:10px;overflow:hidden;">
+            <span style="padding:11px 14px;color:#94a3b8;background:#f8fafc;border-right:1px solid #e2e8f0;"><i class="fa-solid fa-money-bill-wave"></i></span>
+            <select name="salary" style="border:none;outline:none;padding:11px 14px;font-size:.875rem;flex:1;color:#0f172a;font-family:inherit;background:#fff;">
+              <option value="">Mọi mức lương</option>
+              <option value="Thỏa thuận" th:selected="${salary == 'Thỏa thuận'}">Thỏa thuận</option>
+              <option value="Dưới 10"   th:selected="${salary == 'Dưới 10'}">Dưới 10 triệu</option>
+              <option value="10 - 15"   th:selected="${salary == '10 - 15'}">10 - 15 triệu</option>
+              <option value="15 - 20"   th:selected="${salary == '15 - 20'}">15 - 20 triệu</option>
+              <option value="Trên 20"   th:selected="${salary == 'Trên 20'}">Trên 20 triệu</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button type="submit" style="width:100%;padding:11px;background:linear-gradient(135deg,#0ea5e9,#0284c7);color:#fff;font-weight:700;font-size:.9rem;border:none;border-radius:10px;cursor:pointer;box-shadow:0 4px 14px rgba(14,165,233,.4);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;">
+            <i class="fa-solid fa-magnifying-glass"></i> Tìm kiếm ngay
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
 
-    <!-- Footer -->
-    <footer th:replace="~{fragments :: footer}"></footer>
+<!-- ═══ RESULTS ═══ -->
+<section style="background:#f8fafc; padding: 40px 0 60px;">
+  <div class="container">
+    <!-- Stats bar -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;">
+      <div th:if="${totalResults != null}" style="font-size:.9rem;color:#64748b;">
+        Tìm thấy <strong style="color:#0f172a;" th:text="${totalResults}">0</strong> việc làm
+        <span th:if="${keyword != null and !keyword.isEmpty()}"> cho "<strong style="color:#0ea5e9;" th:text="${keyword}"></strong>"</span>
+        <span th:if="${location != null and !location.isEmpty()}"> tại <strong th:text="${location}"></strong></span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:.8rem;color:#94a3b8;">Sắp xếp theo:</span>
+        <select style="padding:6px 12px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:.82rem;outline:none;background:#fff;" onchange="window.location.href=this.value">
+          <option value="">Mới nhất</option>
+        </select>
+      </div>
+    </div>
 
-    <!-- Scripts -->
-    <div th:replace="~{fragments :: scripts}"></div>
+    <!-- Job Cards -->
+    <div class="row g-3" th:if="${!#lists.isEmpty(jobs)}">
+      <div class="col-md-6 col-lg-4" th:each="job : ${jobs}">
+        <a th:href="@{/job/{id}(id=${job.id})}" style="text-decoration:none;">
+          <div style="background:#fff;border-radius:14px;border:1.5px solid #e8eaf0;padding:20px;height:100%;display:flex;flex-direction:column;gap:14px;transition:all .25s;box-shadow:0 1px 4px rgba(0,0,0,.04);" onmouseover="this.style.borderColor='#0ea5e9';this.style.transform='translateY(-3px)';this.style.boxShadow='0 8px 24px rgba(14,165,233,.15)'" onmouseout="this.style.borderColor='#e8eaf0';this.style.transform='';this.style.boxShadow='0 1px 4px rgba(0,0,0,.04)'">
+            <!-- Header: Logo + Title -->
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <!-- Company Logo -->
+              <div style="width:48px;height:48px;border-radius:12px;flex-shrink:0;overflow:hidden;border:1.5px solid #e8eaf0;background:#f8fafc;display:flex;align-items:center;justify-content:center;">
+                <img th:if="${job.company != null and job.company.logo != null and !job.company.logo.isEmpty()}"
+                     th:src="${job.company.logo}"
+                     style="width:100%;height:100%;object-fit:cover;"
+                     th:alt="${job.company.companyName}">
+                <div th:unless="${job.company != null and job.company.logo != null and !job.company.logo.isEmpty()}"
+                     style="width:100%;height:100%;background:linear-gradient(135deg,#0ea5e9,#8b5cf6);display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.1rem;font-weight:800;"
+                     th:text="${job.company != null and job.company.companyName != null ? job.company.companyName.substring(0,1).toUpperCase() : 'C'}">C</div>
+              </div>
+              <div style="min-width:0;flex:1;">
+                <div style="font-weight:700;font-size:.95rem;color:#0f172a;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;" th:text="${job.title}">Tiêu đề</div>
+                <div style="font-size:.8rem;color:#64748b;margin-top:3px;" th:text="${job.company != null ? job.company.companyName : 'Đang cập nhật'}">Công ty</div>
+              </div>
+            </div>
+
+            <!-- Salary -->
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(220,38,38,.06);color:#dc2626;padding:5px 12px;border-radius:20px;font-size:.8rem;font-weight:700;width:fit-content;">
+              <i class="fa-solid fa-money-bill-wave" style="font-size:.7rem;"></i>
+              <span th:text="${job.salary != null ? job.salary : 'Thỏa thuận'}"></span>
+            </div>
+
+            <!-- Tags -->
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              <span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.75rem;background:#f0f9ff;color:#0369a1;">
+                <i class="fa-solid fa-location-dot" style="font-size:.65rem;"></i> <span th:text="${job.location}">Địa điểm</span>
+              </span>
+              <span th:if="${job.workingType != null}" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.75rem;background:#f0fdf4;color:#15803d;">
+                <i class="fa-solid fa-clock" style="font-size:.65rem;"></i> <span th:text="${job.workingType}">Loại</span>
+              </span>
+              <span th:if="${job.experience != null}" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;font-size:.75rem;background:#faf5ff;color:#7c3aed;">
+                <i class="fa-solid fa-star" style="font-size:.65rem;"></i> <span th:text="${job.experience}">KN</span>
+              </span>
+            </div>
+
+            <!-- Footer: deadline + CTA -->
+            <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #f1f5f9;padding-top:12px;margin-top:auto;">
+              <span style="font-size:.78rem;color:#94a3b8;">
+                <i class="fa-regular fa-calendar me-1"></i>Hạn: <span th:text="${#dates.format(job.deadline, 'dd/MM/yyyy')}"></span>
+              </span>
+              <span style="font-size:.78rem;font-weight:700;color:#0ea5e9;">Xem chi tiết →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div th:if="${#lists.isEmpty(jobs)}" style="text-align:center;padding:80px 24px;">
+      <div style="width:80px;height:80px;background:#f1f5f9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:#94a3b8;">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <h5 style="color:#0f172a;font-weight:700;margin-bottom:8px;">Không tìm thấy kết quả phù hợp</h5>
+      <p style="color:#64748b;margin-bottom:20px;">Hãy thử điều chỉnh bộ lọc tìm kiếm</p>
+      <a href="/jobs" style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#0ea5e9;color:#fff;border-radius:10px;text-decoration:none;font-weight:600;">
+        <i class="fa-solid fa-rotate-right"></i> Xem tất cả việc làm
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer th:replace="~{fragments :: footer}"></footer>
+<div th:replace="~{fragments :: scripts}"></div>
 </body>
-
 </html>

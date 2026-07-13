@@ -1,107 +1,148 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{admin/fragments :: head('Quản lý người dùng')}"></head>
-<body>
+<head th:replace="~{admin/fragments :: head('Quản lý Người dùng')}"></head>
+<body class="d-flex">
 
-<div th:replace="~{admin/fragments :: sidebar('users')}"></div>
+<aside th:replace="~{admin/fragments :: sidebar('users')}"></aside>
 
-<div class="admin-main">
-    <!-- Topbar -->
-    <div class="admin-topbar">
-        <h4 class="admin-m-0 admin-fw-bold">Quản lý Người dùng</h4>
-        <div class="admin-flex admin-align-center admin-gap-1">
-            <span class="admin-text-muted">Xin chào, <strong th:text="${session.loggedInUser.fullname}">Admin</strong></span>
+<div class="adm-main">
+    <div class="adm-topbar">
+        <div>
+            <div class="adm-topbar-title">Quản lý Người dùng</div>
+            <div class="adm-topbar-subtitle">Danh sách tài khoản trên hệ thống</div>
+        </div>
+        <div class="d-flex align-items-center gap-3 ms-auto">
+            <div class="text-end">
+                <span class="adm-topbar-user">
+                    <strong th:text="${session.loggedInUser.fullname}">Admin</strong>
+                    Quản trị viên
+                </span>
+            </div>
+            <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=' + session.loggedInUser.fullname + '&background=6366f1&color=fff'}"
+                 class="adm-topbar-avatar" alt="avatar">
         </div>
     </div>
 
-    <!-- Alert Messages -->
-    <div th:if="${success}" class="admin-alert admin-alert-success">
-        <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
-    </div>
-    <div th:if="${error}" class="admin-alert admin-alert-danger">
-        <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
-    </div>
+    <div class="adm-content">
+        <div class="adm-breadcrumb">
+            <a href="/admin/dashboard"><i class="fa-solid fa-house" style="font-size:.7rem;"></i></a>
+            <span class="sep">/</span>
+            <span class="current">Người dùng</span>
+        </div>
 
-    <!-- Users Table -->
-    <div class="admin-card">
-        <table class="admin-table">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Người dùng</th>
-                    <th>Email / SĐT</th>
-                    <th>Vai trò</th>
-                    <th>Trạng thái</th>
-                    <th class="admin-text-end">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr th:each="user : ${users}">
-                    <td class="admin-text-muted" th:text="${user.id}">1</td>
-                    <td>
-                        <div class="admin-flex admin-align-center admin-gap-1">
-                            <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" 
-                                 class="admin-avatar">
-                            <div class="admin-flex-col">
-                                <span class="admin-fw-bold" th:text="${user.fullname}">Tên người dùng</span>
-                                <span class="admin-fs-sm admin-text-muted" th:text="'@' + ${user.username}">username</span>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="admin-fs-sm" th:text="${user.email}">email@example.com</div>
-                        <div class="admin-fs-sm admin-text-muted" th:text="${user.phone}">0123456789</div>
-                    </td>
-                    <td>
-                        <span class="admin-badge admin-bg-danger" th:if="${user.isAdmin == true}">Admin</span>
-                        <span class="admin-badge admin-bg-primary" th:if="${user.isAdmin != true and user.role == true}">Nhà tuyển dụng</span>
-                        <span class="admin-badge admin-bg-info" th:if="${user.isAdmin != true and user.role != true}">Ứng viên</span>
-                    </td>
-                    <td>
-                        <span class="admin-badge admin-bg-success" th:if="${user.isActive == true}">Hoạt động</span>
-                        <span class="admin-badge admin-bg-secondary" th:if="${user.isActive != true}">Bị chặn</span>
-                    </td>
-                    <td>
-                        <div class="admin-table-actions">
-                            <button type="button" class="admin-btn admin-btn-outline-secondary" th:attr="data-admin-modal-target='modal-user-' + ${user.id}">
-                                <i class="fa-solid fa-eye"></i> Xem
-                            </button>
-                            
-                            <form th:if="${user.id != session.loggedInUser.id and user.isAdmin != true}" 
-                                  th:action="@{/admin/users/toggle-block/{id}(id=${user.id})}" method="post"
-                                  onsubmit="return confirm('Bạn có chắc chắn muốn thay đổi trạng thái người dùng này?');">
-                                <button type="submit" class="admin-btn" th:classappend="${user.isActive == true} ? 'admin-btn-outline-danger' : 'admin-btn-outline-success'">
-                                    <i class="fa-solid" th:classappend="${user.isActive == true} ? 'fa-ban' : 'fa-check'"></i> 
-                                    <span th:text="${user.isActive == true} ? 'Chặn' : 'Bỏ chặn'"></span>
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <!-- Alerts -->
+        <div th:if="${success}" class="adm-alert adm-alert-success"><i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span></div>
+        <div th:if="${error}"   class="adm-alert adm-alert-danger"><i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span></div>
+
+        <div class="adm-card">
+            <div class="adm-card-header">
+                <span class="adm-card-title"><i class="fa-solid fa-users me-2" style="color:var(--adm-primary);"></i>Tất cả người dùng (<span th:text="${users.size()}">0</span>)</span>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table class="adm-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Người dùng</th>
+                            <th>Liên hệ</th>
+                            <th>Vai trò</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user, iterStat : ${users}">
+                            <td style="color:var(--adm-text-light); font-size:.78rem;" th:text="${iterStat.count}">1</td>
+                            <td>
+                                <div class="adm-avatar-group">
+                                    <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=6366f1&color=fff'}" class="adm-avatar">
+                                    <div class="adm-avatar-info">
+                                        <div class="name" th:text="${user.fullname}">Họ tên</div>
+                                        <div class="email" th:text="'@' + ${user.username}">@username</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-size:.82rem;" th:text="${user.email}">email</div>
+                                <div style="font-size:.78rem; color:var(--adm-text-muted);" th:text="${user.phone != null ? user.phone : '—'}">phone</div>
+                            </td>
+                            <td>
+                                <span class="adm-badge adm-badge-danger"   th:if="${user.isAdmin == true}"><i class="fa-solid fa-shield-halved"></i> Admin</span>
+                                <span class="adm-badge adm-badge-primary"  th:if="${user.isAdmin != true and user.role == true}"><i class="fa-solid fa-building"></i> NTD</span>
+                                <span class="adm-badge adm-badge-info"     th:if="${user.isAdmin != true and user.role != true}"><i class="fa-solid fa-user"></i> Ứng viên</span>
+                            </td>
+                            <td>
+                                <span class="adm-badge adm-badge-success" th:if="${user.isActive == true}"><i class="fa-solid fa-circle" style="font-size:.5rem;"></i> Hoạt động</span>
+                                <span class="adm-badge adm-badge-neutral" th:if="${user.isActive != true}"><i class="fa-solid fa-circle" style="font-size:.5rem;"></i> Bị chặn</span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2 justify-content-end">
+                                    <button type="button" class="adm-btn adm-btn-ghost adm-btn-sm"
+                                            data-bs-toggle="modal" th:attr="data-bs-target='#userModal' + ${user.id}">
+                                        <i class="fa-solid fa-eye"></i> Chi tiết
+                                    </button>
+                                    <form th:if="${user.id != session.loggedInUser.id and user.isAdmin != true}"
+                                          th:action="@{/admin/users/toggle-block/{id}(id=${user.id})}" method="post"
+                                          onsubmit="return confirm('Thay đổi trạng thái người dùng?');">
+                                        <button type="submit" class="adm-btn adm-btn-sm"
+                                                th:classappend="${user.isActive == true} ? 'adm-btn-danger' : 'adm-btn-success'">
+                                            <i class="fa-solid" th:classappend="${user.isActive == true} ? 'fa-ban' : 'fa-unlock'"></i>
+                                            <span th:text="${user.isActive == true} ? 'Chặn' : 'Bỏ chặn'"></span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${users.isEmpty()}">
+                            <td colspan="6">
+                                <div class="adm-empty">
+                                    <div class="adm-empty-icon"><i class="fa-solid fa-users"></i></div>
+                                    <div class="adm-empty-title">Chưa có người dùng nào</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
-<!-- Modals for User Details -->
+<!-- Modals -->
 <th:block th:each="user : ${users}">
-    <div class="admin-modal-backdrop" th:id="'modal-user-' + ${user.id}">
-        <div class="admin-modal">
-            <div class="admin-modal-header">
-                <h5 class="admin-modal-title">Thông tin Người dùng</h5>
-                <button type="button" class="admin-modal-close"><i class="fa-solid fa-times"></i></button>
-            </div>
-            <div class="admin-modal-body admin-text-center">
-                <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=random'}" 
-                     class="admin-avatar-lg admin-mb-1">
-                <h4 class="admin-fw-bold admin-m-0" th:text="${user.fullname}"></h4>
-                <p class="admin-text-muted admin-mb-2">@<span th:text="${user.username}"></span></p>
-                
-                <div style="background: var(--admin-bg); padding: 1rem; border-radius: 0.5rem; text-align: left;">
-                    <p class="admin-m-0 admin-mb-1"><strong>Email:</strong> <span th:text="${user.email}"></span></p>
-                    <p class="admin-m-0 admin-mb-1"><strong>Điện thoại:</strong> <span th:text="${user.phone}"></span></p>
-                    <p class="admin-m-0 admin-mb-1"><strong>Địa chỉ:</strong> <span th:text="${user.address}"></span></p>
-                    <p class="admin-m-0" th:if="${!user.role}"><strong>Ngành nghề:</strong> <span th:text="${user.profession}"></span></p>
+    <div class="modal fade" th:id="'userModal' + ${user.id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg" style="border-radius:16px; overflow:hidden;">
+                <div class="modal-header border-0" style="background: linear-gradient(135deg,#6366f1,#818cf8); color:#fff; padding:20px 24px;">
+                    <h5 class="modal-title fw-bold">Chi tiết người dùng</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <img th:src="${user.avatar != null ? user.avatar : 'https://ui-avatars.com/api/?name=' + user.fullname + '&background=6366f1&color=fff&size=128'}"
+                             style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #e8eaf0;">
+                        <h5 class="fw-bold mt-2 mb-0" th:text="${user.fullname}">Tên</h5>
+                        <p style="color:var(--adm-text-muted); font-size:.82rem;" th:text="'@' + ${user.username}">@user</p>
+                    </div>
+                    <div style="background:#f8f9fc; border-radius:10px; padding:16px;">
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span style="font-size:.82rem; color:var(--adm-text-muted);">Email</span>
+                            <span style="font-size:.82rem; font-weight:500;" th:text="${user.email}">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span style="font-size:.82rem; color:var(--adm-text-muted);">Điện thoại</span>
+                            <span style="font-size:.82rem; font-weight:500;" th:text="${user.phone != null ? user.phone : '—'}">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between border-bottom py-2">
+                            <span style="font-size:.82rem; color:var(--adm-text-muted);">Địa chỉ</span>
+                            <span style="font-size:.82rem; font-weight:500;" th:text="${user.address != null ? user.address : '—'}">—</span>
+                        </div>
+                        <div class="d-flex justify-content-between py-2">
+                            <span style="font-size:.82rem; color:var(--adm-text-muted);">Ngành nghề</span>
+                            <span style="font-size:.82rem; font-weight:500;" th:text="${user.profession != null ? user.profession : '—'}">—</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
