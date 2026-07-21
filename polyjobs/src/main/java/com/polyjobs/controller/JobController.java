@@ -49,7 +49,7 @@ public class JobController {
             
             // Lấy resumes của candidate đang đăng nhập
             User loggedInUser = (User) session.getAttribute("loggedInUser");
-            if (loggedInUser != null && !loggedInUser.getRole() && !loggedInUser.getIsAdmin()) {
+            if (loggedInUser != null && Boolean.FALSE.equals(loggedInUser.getRole()) && !Boolean.TRUE.equals(loggedInUser.getIsAdmin())) {
                 List<Resume> resumes = resumeRepository.findByCandidateOrderByUploadDateDesc(loggedInUser);
                 model.addAttribute("myResumes", resumes);
                 
@@ -83,8 +83,8 @@ public class JobController {
             return "redirect:/login";
         }
 
-        if (loggedInUser.getRole()) {
-            redirectAttributes.addFlashAttribute("error", "Nhà tuyển dụng không thể ứng tuyển.");
+        if (Boolean.TRUE.equals(loggedInUser.getRole()) || Boolean.TRUE.equals(loggedInUser.getIsAdmin())) {
+            redirectAttributes.addFlashAttribute("error", "Nhà tuyển dụng hoặc quản trị viên không thể ứng tuyển.");
             return "redirect:/job/" + jobId;
         }
 
@@ -118,8 +118,8 @@ public class JobController {
             return "redirect:/login";
         }
 
-        if (loggedInUser.getRole()) {
-            redirectAttributes.addFlashAttribute("error", "Nhà tuyển dụng không thể sử dụng chức năng này.");
+        if (Boolean.TRUE.equals(loggedInUser.getRole()) || Boolean.TRUE.equals(loggedInUser.getIsAdmin())) {
+            redirectAttributes.addFlashAttribute("error", "Nhà tuyển dụng hoặc quản trị viên không thể sử dụng chức năng này.");
             return "redirect:/job/" + jobId;
         }
 

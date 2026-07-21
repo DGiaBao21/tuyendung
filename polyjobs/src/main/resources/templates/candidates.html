@@ -106,14 +106,20 @@
               <span th:text="${candidate.address}">address</span>
             </div>
           </div>
-          <!-- CV Button -->
-          <div th:if="${candidateCvMap.containsKey(candidate.id)}">
-            <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" style="font-size:.875rem;" data-bs-toggle="modal" th:attr="data-bs-target='#modal-cv-' + ${candidate.id}">
-              <i class="fa-solid fa-file-pdf me-2"></i> Xem CV / Hồ sơ
-            </button>
-          </div>
-          <div th:unless="${candidateCvMap.containsKey(candidate.id)}" style="padding:9px;background:#f1f5f9;border-radius:20px;font-size:.82rem;color:#94a3b8;">
-            <i class="fa-solid fa-file-slash me-2"></i> Chưa có CV
+          <!-- CV & Chat Buttons -->
+          <div class="d-flex flex-column gap-2 mt-auto">
+              <div th:if="${candidateCvMap.containsKey(candidate.id)}">
+                <button type="button" class="btn btn-primary w-100 rounded-pill fw-bold" style="font-size:.875rem;" data-bs-toggle="modal" th:attr="data-bs-target='#modal-cv-' + ${candidate.id}">
+                  <i class="fa-solid fa-file-pdf me-2"></i> Xem CV / Hồ sơ
+                </button>
+              </div>
+              <div th:unless="${candidateCvMap.containsKey(candidate.id)}" style="padding:9px;background:#f1f5f9;border-radius:20px;font-size:.82rem;color:#94a3b8;">
+                <i class="fa-solid fa-file-slash me-2"></i> Chưa có CV
+              </div>
+              
+              <a th:href="@{/messages(userId=${candidate.id})}" class="btn w-100 rounded-pill fw-bold" style="background:#f1f5f9; color:#0ea5e9; font-size:.875rem; border:1px solid #e0f2fe; transition: all 0.2s;" onmouseover="this.style.background='#e0f2fe'" onmouseout="this.style.background='#f1f5f9'">
+                <i class="fa-solid fa-comment-dots me-2"></i> Nhắn tin
+              </a>
           </div>
         </div>
 
