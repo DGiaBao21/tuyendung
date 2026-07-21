@@ -47,6 +47,9 @@ public class ProfileController {
     @Autowired
     private SavedJobRepository savedJobRepository;
 
+    @Autowired
+    private com.polyjobs.service.FileUploadService fileUploadService;
+
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
         User loggedInUser = (User) session.getAttribute("loggedInUser");
@@ -141,17 +144,10 @@ public class ProfileController {
 
             if (logoFile != null && !logoFile.isEmpty()) {
                 try {
-                    String uploadDir = "src/main/resources/static/uploads/company/";
-                    File uploadDirFile = new File(uploadDir);
-                    if (!uploadDirFile.exists()) {
-                        uploadDirFile.mkdirs();
+                    String logoUrl = fileUploadService.saveFile(logoFile, "company");
+                    if (logoUrl != null) {
+                        company.setLogo(logoUrl);
                     }
-                    String originalFilename = logoFile.getOriginalFilename();
-                    String extension = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
-                    String newFilename = UUID.randomUUID().toString() + extension;
-                    Path path = Paths.get(uploadDir + newFilename);
-                    Files.copy(logoFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                    company.setLogo("/uploads/company/" + newFilename);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -180,32 +176,18 @@ public class ProfileController {
         }
 
         try {
-            // Tạo thư mục nếu chưa có
-            String uploadDir = "src/main/resources/static/uploads/cv/";
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) {
-                uploadDirFile.mkdirs();
+            String cvUrl = fileUploadService.saveFile(cvFile, "cv");
+            if (cvUrl != null) {
+                String originalFilename = cvFile.getOriginalFilename();
+                Resume resume = new Resume();
+                resume.setCandidate(loggedInUser);
+                resume.setFileName(cvUrl);
+                resume.setTitle(originalFilename);
+                resume.setUploadDate(new Date());
+                resumeRepository.save(resume);
+
+                redirectAttributes.addFlashAttribute("success", "Tải lên CV thành công!");
             }
-
-            // Đặt tên file ngẫu nhiên để tránh trùng lặp
-            String originalFilename = cvFile.getOriginalFilename();
-            String extension = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
-            String newFilename = UUID.randomUUID().toString() + extension;
-            Path path = Paths.get(uploadDir + newFilename);
-
-            // Lưu file
-            Files.copy(cvFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-            // Lưu thông tin vào CSDL
-            Resume resume = new Resume();
-            resume.setCandidate(loggedInUser);
-            resume.setFileName("/uploads/cv/" + newFilename);
-            resume.setTitle(originalFilename);
-            resume.setUploadDate(new Date());
-            resumeRepository.save(resume);
-
-            redirectAttributes.addFlashAttribute("success", "Tải lên CV thành công!");
-
         } catch (IOException e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Đã xảy ra lỗi khi tải lên CV!");
@@ -231,32 +213,16 @@ public class ProfileController {
         }
 
         try {
-            // Tạo thư mục nếu chưa có
-            String uploadDir = "src/main/resources/static/uploads/avatars/";
-            File uploadDirFile = new File(uploadDir);
-            if (!uploadDirFile.exists()) {
-                uploadDirFile.mkdirs();
+            String avatarUrl = fileUploadService.saveFile(avatarFile, "avatars");
+            if (avatarUrl != null) {
+                User user = userRepository.findById(loggedInUser.getId()).orElse(null);
+                if (user != null) {
+                    user.setAvatar(avatarUrl);
+                    userRepository.save(user);
+                    session.setAttribute("loggedInUser", user);
+                }
+                redirectAttributes.addFlashAttribute("success", "Cập nhật ảnh đại diện thành công!");
             }
-
-            // Đặt tên file ngẫu nhiên để tránh trùng lặp
-            String originalFilename = avatarFile.getOriginalFilename();
-            String extension = originalFilename != null && originalFilename.contains(".") ? originalFilename.substring(originalFilename.lastIndexOf(".")) : "";
-            String newFilename = UUID.randomUUID().toString() + extension;
-            Path path = Paths.get(uploadDir + newFilename);
-
-            // Lưu file
-            Files.copy(avatarFile.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-
-            // Cập nhật URL ảnh đại diện vào User
-            User user = userRepository.findById(loggedInUser.getId()).orElse(null);
-            if (user != null) {
-                user.setAvatar("/uploads/avatars/" + newFilename);
-                userRepository.save(user);
-                session.setAttribute("loggedInUser", user);
-            }
-
-            redirectAttributes.addFlashAttribute("success", "Cập nhật ảnh đại diện thành công!");
-
         } catch (IOException e) {
             e.printStackTrace();
             redirectAttributes.addFlashAttribute("error", "Đã xảy ra lỗi khi tải lên ảnh!");
@@ -279,11 +245,7 @@ public class ProfileController {
         Resume resume = resumeRepository.findById(id).orElse(null);
         if (resume != null && resume.getCandidate().getId().equals(loggedInUser.getId())) {
             try {
-                String filePath = "src/main/resources/static" + resume.getFileName();
-                File file = new File(filePath);
-                if (file.exists()) {
-                    file.delete();
-                }
+                fileUploadService.deleteFile(resume.getFileName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
