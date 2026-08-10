@@ -16,19 +16,19 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto ms-3">
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activePage == 'home'} ? 'active'" th:href="@{/}">Trang chủ</a>
+                    <a class="nav-link" th:classappend="${activePage == 'home'} ? 'active'" th:href="@{/}"><i class="fa-solid fa-house me-1"></i>Trang chủ</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activePage == 'jobs'} ? 'active'" th:href="@{/jobs}">Việc làm</a>
+                    <a class="nav-link" th:classappend="${activePage == 'jobs'} ? 'active'" th:href="@{/jobs}"><i class="fa-solid fa-briefcase me-1"></i>Việc làm</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activePage == 'companies'} ? 'active'" th:href="@{/companies}">Công ty</a>
+                    <a class="nav-link" th:classappend="${activePage == 'companies'} ? 'active'" th:href="@{/companies}"><i class="fa-solid fa-building me-1"></i>Công ty</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activePage == 'candidates'} ? 'active'" th:href="@{/candidates}">Ứng viên</a>
+                    <a class="nav-link" th:classappend="${activePage == 'community'} ? 'active'" th:href="@{/community}"><i class="fa-solid fa-users me-1"></i>Cộng đồng</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" th:classappend="${activePage == 'about'} ? 'active'" th:href="@{/about}">Về chúng tôi</a>
+                    <a class="nav-link" th:classappend="${activePage == 'about'} ? 'active'" th:href="@{/about}"><i class="fa-solid fa-circle-info me-1"></i>Về chúng tôi</a>
                 </li>
             </ul>
             <div class="d-flex gap-2" th:if="${session.loggedInUser == null}">
@@ -104,7 +104,9 @@
                         
                         <li><hr class="dropdown-divider"></li>
                         <li>
-                            <a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</a>
+                            <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                                <button type="submit" class="dropdown-item text-danger border-0 bg-transparent text-start w-100"><i class="fa-solid fa-right-from-bracket me-2"></i> Đăng xuất</button>
+                            </form>
                         </li>
                     </ul>
                 </div>

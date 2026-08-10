@@ -226,29 +226,33 @@
                     <h5 class="modal-title fw-bold" id="applyModalLabel">Ứng tuyển <span class="text-primary" th:text="${job.title}"></span></h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form th:action="@{/job/apply}" method="post">
+                <form th:action="@{/job/apply}" method="post" enctype="multipart/form-data">
                     <div class="modal-body py-4">
                         <input type="hidden" name="jobId" th:value="${job.id}" />
-                        
+
+                        <!-- Upload CV trực tiếp -->
                         <div class="mb-3">
-                            <label class="form-label fw-bold">Chọn CV của bạn <span class="text-danger">*</span></label>
-                            <select class="form-select" name="resumeId" required>
-                                <option value="" disabled selected>-- Chọn CV đã tải lên --</option>
-                                <option th:each="cv : ${myResumes}" th:value="${cv.id}" th:text="${cv.fileName + ' (' + #dates.format(cv.uploadDate, 'dd/MM/yyyy') + ')'}"></option>
-                            </select>
-                            <div th:if="${myResumes == null or myResumes.isEmpty()}" class="form-text text-danger mt-2">
-                                Bạn chưa có CV nào. Vui lòng vào <a th:href="@{/profile}">Trang cá nhân</a> để tải lên CV trước.
+                            <label for="cvFile" class="form-label fw-bold">
+                                <i class="fa-solid fa-file-arrow-up me-1 text-primary"></i>
+                                Tải lên CV của bạn <span class="text-danger">*</span>
+                            </label>
+                            <input class="form-control" type="file" id="cvFile" name="cvFile"
+                                   accept=".pdf,.doc,.docx" required>
+                            <div class="form-text text-muted mt-1">
+                                <i class="fa-solid fa-circle-info me-1"></i>
+                                Chấp nhận file PDF, Word (.doc, .docx). Tối đa 5MB.
                             </div>
                         </div>
-                        
+
                         <div class="mb-3">
                             <label class="form-label fw-bold">Thư giới thiệu (Cover Letter)</label>
-                            <textarea class="form-control" name="coverLetter" rows="4" placeholder="Giới thiệu ngắn gọn về bản thân và lý do bạn phù hợp với công việc này..."></textarea>
+                            <textarea class="form-control" name="coverLetter" rows="4"
+                                      placeholder="Giới thiệu ngắn gọn về bản thân và lý do bạn phù hợp với công việc này..."></textarea>
                         </div>
                     </div>
                     <div class="modal-footer border-top-0 pt-0">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
-                        <button type="submit" class="btn btn-primary" th:disabled="${myResumes == null or myResumes.isEmpty()}">
+                        <button type="submit" class="btn btn-primary">
                             <i class="fa-solid fa-paper-plane me-1"></i> Gửi hồ sơ
                         </button>
                     </div>
@@ -256,6 +260,7 @@
             </div>
         </div>
     </div>
+
 
     <!-- Scripts (from fragment) -->
     <div th:replace="~{fragments :: scripts}"></div>

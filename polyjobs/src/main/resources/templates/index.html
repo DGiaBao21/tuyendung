@@ -77,6 +77,8 @@
                          style="max-height:460px;width:auto;position:relative;z-index:1;
                                 mix-blend-mode:screen;
                                 filter:brightness(1.05) contrast(1.1) drop-shadow(0 0 24px rgba(56,189,248,0.6));
+                                -webkit-mask-image:radial-gradient(ellipse 80% 85% at 50% 50%, black 55%, transparent 100%);
+                                mask-image:radial-gradient(ellipse 80% 85% at 50% 50%, black 55%, transparent 100%);
                                 animation:mapFloat 5s ease-in-out infinite;">
                 </div>
             </div>
@@ -89,13 +91,15 @@
             <div class="row align-items-center g-5">
                 <!-- Left: Map Image -->
                 <div class="col-lg-5 text-center" data-aos="fade-right" data-aos-duration="900">
-                    <div style="position: relative; display: inline-block;">
+                    <div style="position: relative; display: inline-block; background: transparent;">
                         <!-- Glow effect behind map -->
                         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 380px; height: 380px; background: radial-gradient(circle, rgba(56,189,248,0.3) 0%, transparent 65%); border-radius: 50%; filter: blur(40px); z-index: 0; pointer-events:none;"></div>
                         <img th:src="@{/images/vietnam-map.png}" alt="Bản đồ Việt Nam - Khu vực Đồng bằng sông Cửu Long"
                              style="max-height: 500px; width: auto; position: relative; z-index: 1;
                                     mix-blend-mode: screen;
                                     filter: brightness(1.1) contrast(1.15) drop-shadow(0 0 28px rgba(56,189,248,0.7));
+                                    -webkit-mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 55%, transparent 100%);
+                                    mask-image: radial-gradient(ellipse 80% 85% at 50% 50%, black 55%, transparent 100%);
                                     animation: mapFloat 4s ease-in-out infinite;">
                     </div>
                 </div>

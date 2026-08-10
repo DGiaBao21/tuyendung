@@ -42,6 +42,9 @@ public class ProfileController {
     private com.polyjobs.repository.CompanyRepository companyRepository;
 
     @Autowired
+    private com.polyjobs.service.UserService userService;
+
+    @Autowired
     private ApplicationRepository applicationRepository;
 
     @Autowired
@@ -52,7 +55,8 @@ public class ProfileController {
 
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
@@ -62,7 +66,7 @@ public class ProfileController {
         if (user == null) {
             return "redirect:/login";
         }
-        session.setAttribute("loggedInUser", user);
+        session.setAttribute("loggedInUser", userService.convertToDTO(user));
         model.addAttribute("user", user);
 
         // Nếu là ứng viên, lấy danh sách CV, lịch sử ứng tuyển, việc làm đã lưu
@@ -99,7 +103,8 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
@@ -113,7 +118,7 @@ public class ProfileController {
                 user.setProfession(profession);
             }
             userRepository.save(user);
-            session.setAttribute("loggedInUser", user);
+            session.setAttribute("loggedInUser", userService.convertToDTO(user));
             redirectAttributes.addFlashAttribute("success", "Cập nhật thông tin thành công!");
         }
 
@@ -130,7 +135,8 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null || !Boolean.TRUE.equals(loggedInUser.getRole())) {
             return "redirect:/login";
         }
@@ -165,7 +171,8 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
@@ -202,7 +209,8 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
@@ -219,7 +227,7 @@ public class ProfileController {
                 if (user != null) {
                     user.setAvatar(avatarUrl);
                     userRepository.save(user);
-                    session.setAttribute("loggedInUser", user);
+                    session.setAttribute("loggedInUser", userService.convertToDTO(user));
                 }
                 redirectAttributes.addFlashAttribute("success", "Cập nhật ảnh đại diện thành công!");
             }
@@ -237,13 +245,20 @@ public class ProfileController {
             HttpSession session,
             RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userRepository.findById(loggedInUserDTO.getId()).orElse(null) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
 
         Resume resume = resumeRepository.findById(id).orElse(null);
         if (resume != null && resume.getCandidate().getId().equals(loggedInUser.getId())) {
+            // Kiểm tra xem CV này đã được dùng để ứng tuyển chưa
+            if (applicationRepository.existsByResume(resume)) {
+                redirectAttributes.addFlashAttribute("error", "Không thể xóa CV này vì đã được dùng để ứng tuyển!");
+                return "redirect:/profile";
+            }
+
             try {
                 fileUploadService.deleteFile(resume.getFileName());
             } catch (Exception e) {

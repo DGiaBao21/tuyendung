@@ -28,71 +28,101 @@
             <div th:each="app : ${applications}"
                  style="background:#fff;border-radius:14px;border:1.5px solid #e8eaf0;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.04);">
 
-                <div style="padding:20px 24px;">
-                    <div class="d-flex gap-4 flex-wrap align-items-start">
-                        <!-- Avatar -->
-                        <img th:src="${app.candidate.avatar != null ? app.candidate.avatar : 'https://ui-avatars.com/api/?name=' + app.candidate.fullname + '&background=6366f1&color=fff&size=80'}"
-                             style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #e8eaf0;flex-shrink:0;">
-
-                        <!-- Info -->
-                        <div style="flex:1;min-width:200px;">
-                            <div style="font-weight:700;font-size:1rem;color:#1e293b;" th:text="${app.candidate.fullname}">Họ tên</div>
-                            <div style="font-size:.82rem;color:#6366f1;margin-top:2px;" th:text="${app.candidate.profession}">Ngành nghề</div>
-                            <div style="display:flex;gap:16px;margin-top:8px;flex-wrap:wrap;">
-                                <span style="font-size:.78rem;color:#64748b;"><i class="fa-solid fa-envelope me-1"></i><span th:text="${app.candidate.email}"></span></span>
-                                <span style="font-size:.78rem;color:#64748b;" th:if="${app.candidate.phone != null}"><i class="fa-solid fa-phone me-1"></i><span th:text="${app.candidate.phone}"></span></span>
-                                <span style="font-size:.78rem;color:#64748b;"><i class="fa-regular fa-calendar me-1"></i>Nộp ngày <span th:text="${#dates.format(app.applyDate, 'dd/MM/yyyy')}"></span></span>
+                <div style="padding: 24px;">
+                    <!-- Top Row: Avatar + Basic Info + Badge -->
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+                        <div class="d-flex gap-3 align-items-center">
+                            <!-- Avatar -->
+                            <img th:src="${app.candidate.avatar != null ? app.candidate.avatar : 'https://ui-avatars.com/api/?name=' + app.candidate.fullname + '&background=6366f1&color=fff&size=80'}"
+                                 style="width:64px;height:64px;border-radius:50%;object-fit:cover;border:2px solid #e8eaf0;flex-shrink:0;">
+                            <!-- Name and Title -->
+                            <div>
+                                <div style="font-weight:800;font-size:1.15rem;color:#1e293b;" th:text="${app.candidate.fullname}">Họ tên</div>
+                                <div style="font-size:.875rem;color:#6366f1;margin-top:2px;font-weight:600;" th:text="${app.candidate.profession}">Ngành nghề</div>
                             </div>
                         </div>
+                        <!-- Badge -->
+                        <span th:text="${app.status}"
+                              th:style="${app.status == 'Chờ duyệt' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);' : (app.status == 'Từ chối' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);' : (app.status == 'Trúng tuyển' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.2);' : (app.status == 'Hẹn phỏng vấn' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2);' : 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')))}"
+                              >Trạng thái</span>
+                    </div>
 
-                        <!-- Status Badge -->
-                        <div style="flex-shrink:0;">
-                            <span th:text="${app.status}"
-                                  th:style="${app.status == 'Chờ duyệt'} ? 'display:inline-block;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(245,158,11,.1);color:#d97706;' : (${app.status == 'Từ chối'} ? 'display:inline-block;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(239,68,68,.1);color:#dc2626;' : (${app.status == 'Trúng tuyển'} ? 'display:inline-block;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;' : (${app.status == 'Hẹn phỏng vấn'} ? 'display:inline-block;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(6,182,212,.1);color:#0891b2;' : 'display:inline-block;padding:5px 14px;border-radius:20px;font-size:.75rem;font-weight:700;background:#f1f5f9;color:#64748b;'))))"
-                                  >Trạng thái</span>
+                    <!-- Middle Row: Details Grid -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6 d-flex flex-column gap-2">
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-envelope me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${app.candidate.email}"></span></span>
+                            <span style="font-size:.9rem;color:#475569;" th:if="${app.candidate.phone != null}"><i class="fa-solid fa-phone me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${app.candidate.phone}"></span></span>
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-location-dot me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${#strings.isEmpty(app.candidate.address) ? 'Chưa cập nhật' : app.candidate.address}"></span></span>
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-graduation-cap me-2" style="color:#94a3b8;width:16px;"></i><span>FPT Polytechnic</span></span>
                         </div>
-
-                        <!-- CV Button -->
-                        <div style="flex-shrink:0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-                            <a th:if="${app.resume != null}" th:href="${app.resume.fileName}" target="_blank"
-                               style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:rgba(99,102,241,.08);border:1.5px solid rgba(99,102,241,.2);color:#6366f1;font-size:.8rem;font-weight:600;text-decoration:none;">
-                                <i class="fa-solid fa-file-pdf"></i> Xem CV
-                            </a>
-                            <button th:if="${app.coverLetter != null and !app.coverLetter.isEmpty()}"
-                                    data-bs-toggle="modal" th:attr="data-bs-target='#coverLetterModal' + ${app.id}"
-                                    style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;background:transparent;border:1.5px solid #e8eaf0;color:#64748b;font-size:.8rem;font-weight:600;cursor:pointer;">
-                                <i class="fa-solid fa-envelope-open-text"></i> Cover Letter
-                            </button>
+                        <div class="col-md-6 d-flex flex-column gap-2">
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-briefcase me-2" style="color:#94a3b8;width:16px;"></i><span>1 năm kinh nghiệm</span></span>
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-money-bill-wave me-2" style="color:#94a3b8;width:16px;"></i><span>Thỏa thuận</span></span>
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-regular fa-calendar me-2" style="color:#94a3b8;width:16px;"></i><span>Nộp ngày: <strong style="color:#333;" th:text="${app.applyDate != null ? #dates.format(app.applyDate, 'dd/MM/yyyy') : ''}"></strong></span></span>
                         </div>
                     </div>
-                </div>
 
-                <!-- Update Status Footer -->
-                <div style="background:#f8f9fc;border-top:1px solid #e8eaf0;padding:14px 24px;">
-                    <form th:action="@{/employer/application/status}" method="post">
-                        <input type="hidden" name="applicationId" th:value="${app.id}">
-                        <div class="d-flex align-items-center gap-3 flex-wrap">
-                            <label style="font-size:.8rem;font-weight:600;color:#374151;flex-shrink:0;">Cập nhật trạng thái:</label>
-                            <select name="status"
-                                    style="padding:7px 12px;border:1.5px solid #e8eaf0;border-radius:8px;font-size:.82rem;outline:none;background:#fff;font-family:inherit;min-width:160px;"
-                                    onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e8eaf0'">
-                                <option value="Chờ duyệt"    th:selected="${app.status == 'Chờ duyệt'}">⏳ Chờ duyệt</option>
-                                <option value="Đã xem"       th:selected="${app.status == 'Đã xem'}">👁 Đã xem</option>
-                                <option value="Hẹn phỏng vấn" th:selected="${app.status == 'Hẹn phỏng vấn'}">📅 Hẹn phỏng vấn</option>
-                                <option value="Trúng tuyển"  th:selected="${app.status == 'Trúng tuyển'}">✅ Trúng tuyển</option>
-                                <option value="Từ chối"      th:selected="${app.status == 'Từ chối'}">❌ Từ chối</option>
-                            </select>
-                            <input type="text" name="note" th:value="${app.note}"
-                                   placeholder="Ghi chú: Thời gian PV, lý do từ chối..."
-                                   style="padding:7px 12px;border:1.5px solid #e8eaf0;border-radius:8px;font-size:.82rem;outline:none;font-family:inherit;flex:1;min-width:200px;transition:border-color .2s;"
-                                   onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e8eaf0'">
-                            <button type="submit"
-                                    style="display:inline-flex;align-items:center;gap:6px;padding:7px 18px;border-radius:8px;background:#6366f1;color:#fff;font-size:.82rem;font-weight:700;border:none;cursor:pointer;flex-shrink:0;transition:all .2s;"
-                                    onmouseover="this.style.background='#4f46e5'" onmouseout="this.style.background='#6366f1'">
-                                <i class="fa-solid fa-floppy-disk"></i> Lưu
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
+                        <!-- View/Message Buttons -->
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a th:if="${app.resume != null}" th:href="@{${app.resume.fileName}}" target="_blank"
+                               style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:rgba(99,102,241,.1);color:#6366f1;font-size:.875rem;font-weight:700;text-decoration:none;transition:all 0.2s;"
+                               onmouseover="this.style.background='rgba(99,102,241,.15)'" onmouseout="this.style.background='rgba(99,102,241,.1)'">
+                                <i class="fa-solid fa-file-pdf"></i> Xem CV
+                            </a>
+                            <button th:if="${!#strings.isEmpty(app.coverLetter)}"
+                                    data-bs-toggle="modal" th:attr="data-bs-target='#coverLetterModal' + ${app.id}"
+                                    style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:transparent;border:1.5px solid #e8eaf0;color:#475569;font-size:.875rem;font-weight:700;cursor:pointer;transition:all 0.2s;"
+                                    onmouseover="this.style.background='#f8f9fc'" onmouseout="this.style.background='transparent'">
+                                <i class="fa-solid fa-eye"></i> Xem hồ sơ
                             </button>
+                            <a href="#" style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:transparent;border:1.5px solid #e8eaf0;color:#0ea5e9;font-size:.875rem;font-weight:700;cursor:pointer;text-decoration:none;transition:all 0.2s;"
+                               onmouseover="this.style.background='#f0f9ff'; this.style.borderColor='#bae6fd';" onmouseout="this.style.background='transparent'; this.style.borderColor='#e8eaf0';">
+                                <i class="fa-solid fa-message"></i> Nhắn tin
+                            </a>
                         </div>
-                    </form>
+                        
+                        <!-- Approve/Reject forms -->
+                        <div class="d-flex gap-2 flex-wrap">
+                            <form th:action="@{/employer/application/status}" method="post" class="m-0">
+                                <input type="hidden" name="applicationId" th:value="${app.id}">
+                                <input type="hidden" name="status" value="Trúng tuyển">
+                                <input type="hidden" name="note" th:value="${app.note}">
+                                <button type="submit" style="display:inline-flex;align-items:center;gap:8px;padding:9px 24px;border-radius:10px;background:#16a34a;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 4px rgba(22,163,74,.2);transition:all 0.2s;"
+                                        onmouseover="this.style.background='#15803d'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#16a34a'; this.style.transform='translateY(0)';">
+                                    <i class="fa-solid fa-check"></i> Duyệt
+                                </button>
+                            </form>
+                            <form th:action="@{/employer/application/status}" method="post" class="m-0">
+                                <input type="hidden" name="applicationId" th:value="${app.id}">
+                                <input type="hidden" name="status" value="Từ chối">
+                                <input type="hidden" name="note" th:value="${app.note}">
+                                <button type="submit" style="display:inline-flex;align-items:center;gap:8px;padding:9px 24px;border-radius:10px;background:#ef4444;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 4px rgba(239,68,68,.2);transition:all 0.2s;"
+                                        onmouseover="this.style.background='#dc2626'; this.style.transform='translateY(-1px)';" onmouseout="this.style.background='#ef4444'; this.style.transform='translateY(0)';">
+                                    <i class="fa-solid fa-xmark"></i> Từ chối
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- HR Note -->
+                    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:10px;padding:14px 20px;">
+                        <form th:action="@{/employer/application/status}" method="post" class="m-0 d-flex gap-3 align-items-center">
+                            <input type="hidden" name="applicationId" th:value="${app.id}">
+                            <input type="hidden" name="status" th:value="${app.status}">
+                            <div style="width:36px;height:36px;border-radius:8px;background:rgba(99,102,241,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                                <i class="fa-solid fa-pencil" style="color:#6366f1;font-size:.9rem;"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;">Ghi chú của HR</label>
+                                <input type="text" name="note" th:value="${app.note}" placeholder="Thêm ghi chú nội bộ, hẹn lịch phỏng vấn..."
+                                       style="width:100%;border:none;background:transparent;outline:none;font-size:.9rem;color:#0f172a;font-weight:500;">
+                            </div>
+                            <button type="submit" style="background:transparent;border:none;color:#6366f1;font-weight:700;font-size:.9rem;cursor:pointer;padding:8px;border-radius:6px;transition:all 0.2s;"
+                                    onmouseover="this.style.background='rgba(99,102,241,.1)'" onmouseout="this.style.background='transparent'">Lưu ghi chú</button>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- Cover Letter Modal -->

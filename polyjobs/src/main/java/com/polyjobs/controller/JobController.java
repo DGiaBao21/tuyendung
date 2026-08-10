@@ -9,6 +9,7 @@ import com.polyjobs.repository.ApplicationRepository;
 import com.polyjobs.repository.JobRepository;
 import com.polyjobs.repository.ResumeRepository;
 import com.polyjobs.repository.SavedJobRepository;
+import com.polyjobs.service.FileUploadService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,13 +18,20 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.List;
+import java.util.Date;
 import java.util.Optional;
 
 @Controller
 public class JobController {
+
+    @Autowired
+    private com.polyjobs.service.UserService userService;
+
+    @Autowired
+    private FileUploadService fileUploadService;
 
     @Autowired
     private JobRepository jobRepository;
@@ -37,47 +45,46 @@ public class JobController {
     @Autowired
     private SavedJobRepository savedJobRepository;
 
-    // Đường dẫn có chứa ID của công việc (Ví dụ: /job/1)
+    // Trang chi tiết công việc
     @GetMapping("/job/{id}")
     public String jobDetail(@PathVariable("id") Integer id, Model model, HttpSession session) {
-        // Tìm công việc theo ID
         Optional<Job> jobOptional = jobRepository.findById(id);
-        
+
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             model.addAttribute("job", job);
-            
-            // Lấy resumes của candidate đang đăng nhập
-            User loggedInUser = (User) session.getAttribute("loggedInUser");
+
+            com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+            User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
+
             if (loggedInUser != null && Boolean.FALSE.equals(loggedInUser.getRole()) && !Boolean.TRUE.equals(loggedInUser.getIsAdmin())) {
-                List<Resume> resumes = resumeRepository.findByCandidateOrderByUploadDateDesc(loggedInUser);
-                model.addAttribute("myResumes", resumes);
-                
                 // Kiểm tra xem đã ứng tuyển chưa
                 boolean hasApplied = applicationRepository.findByJob(job).stream()
-                                        .anyMatch(a -> a.getCandidate().getId().equals(loggedInUser.getId()));
+                        .anyMatch(a -> a.getCandidate().getId().equals(loggedInUser.getId()));
                 model.addAttribute("hasApplied", hasApplied);
-                
+
                 // Kiểm tra xem đã lưu việc làm chưa
                 boolean isSaved = savedJobRepository.findByCandidateAndJob(loggedInUser, job).isPresent();
                 model.addAttribute("isSaved", isSaved);
             }
 
-            return "job-detail";  
+            return "job-detail";
         } else {
-            // Nếu không tìm thấy (ID sai), đá về trang chủ
             return "redirect:/";
         }
     }
 
+    // Ứng tuyển công việc — upload CV trực tiếp
     @PostMapping("/job/apply")
     public String applyJob(@RequestParam("jobId") Integer jobId,
-                           @RequestParam("resumeId") Integer resumeId,
+                           @RequestParam(value = "cvFile", required = false) MultipartFile cvFile,
                            @RequestParam(value = "coverLetter", required = false) String coverLetter,
                            HttpSession session,
                            RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
+
         if (loggedInUser == null) {
             redirectAttributes.addFlashAttribute("error", "Bạn cần đăng nhập để ứng tuyển.");
             return "redirect:/login";
@@ -88,31 +95,53 @@ public class JobController {
             return "redirect:/job/" + jobId;
         }
 
-        Optional<Job> jobOptional = jobRepository.findById(jobId);
-        Optional<Resume> resumeOptional = resumeRepository.findById(resumeId);
+        if (cvFile == null || cvFile.isEmpty()) {
+            redirectAttributes.addFlashAttribute("error", "Vui lòng chọn file CV để ứng tuyển!");
+            return "redirect:/job/" + jobId;
+        }
 
-        if (jobOptional.isPresent() && resumeOptional.isPresent()) {
+        Optional<Job> jobOptional = jobRepository.findById(jobId);
+        if (!jobOptional.isPresent()) {
+            redirectAttributes.addFlashAttribute("error", "Không tìm thấy công việc!");
+            return "redirect:/job/" + jobId;
+        }
+
+        try {
+            // Upload CV và lưu vào DB
+            String cvUrl = fileUploadService.saveFile(cvFile, "cv");
+            Resume resume = new Resume();
+            resume.setCandidate(loggedInUser);
+            resume.setFileName(cvUrl);
+            resume.setTitle(cvFile.getOriginalFilename());
+            resume.setUploadDate(new Date());
+            resumeRepository.save(resume);
+
+            // Tạo đơn ứng tuyển
             Application application = new Application();
             application.setJob(jobOptional.get());
             application.setCandidate(loggedInUser);
-            application.setResume(resumeOptional.get());
+            application.setResume(resume);
             application.setCoverLetter(coverLetter);
-            
             applicationRepository.save(application);
+
             redirectAttributes.addFlashAttribute("success", "Ứng tuyển thành công!");
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra, không tìm thấy công việc hoặc CV.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Có lỗi xảy ra khi tải CV. Vui lòng thử lại!");
         }
 
         return "redirect:/job/" + jobId;
     }
 
+    // Lưu / Bỏ lưu việc làm
     @PostMapping("/job/save")
     public String toggleSaveJob(@RequestParam("jobId") Integer jobId,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
 
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
+
         if (loggedInUser == null) {
             redirectAttributes.addFlashAttribute("error", "Bạn cần đăng nhập để lưu công việc.");
             return "redirect:/login";
@@ -127,13 +156,11 @@ public class JobController {
         if (jobOptional.isPresent()) {
             Job job = jobOptional.get();
             Optional<SavedJob> savedJobOptional = savedJobRepository.findByCandidateAndJob(loggedInUser, job);
-            
+
             if (savedJobOptional.isPresent()) {
-                // Đã lưu -> Hủy lưu
                 savedJobRepository.delete(savedJobOptional.get());
                 redirectAttributes.addFlashAttribute("success", "Đã bỏ lưu công việc!");
             } else {
-                // Chưa lưu -> Lưu
                 SavedJob savedJob = new SavedJob();
                 savedJob.setCandidate(loggedInUser);
                 savedJob.setJob(job);
@@ -141,7 +168,7 @@ public class JobController {
                 redirectAttributes.addFlashAttribute("success", "Đã lưu công việc thành công!");
             }
         }
-        
+
         return "redirect:/job/" + jobId;
     }
 }

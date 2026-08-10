@@ -14,12 +14,16 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/admin")
 public class CategoryController {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.polyjobs.service.UserService userService;
+
     @Autowired
     private CategoryRepository categoryRepository;
 
     // Kiểm tra quyền Admin
     private boolean isAdmin(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO userDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User user = userDTO != null ? userService.findEntityById(userDTO.getId()) : null;
         return user != null && Boolean.TRUE.equals(user.getIsAdmin());
     }
 

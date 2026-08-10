@@ -28,7 +28,7 @@ public class FileUploadService {
             return null;
         }
 
-        Path targetDir = Paths.get(uploadDir, subDir);
+        Path targetDir = Paths.get(uploadDir, subDir).toAbsolutePath().normalize();
         if (!Files.exists(targetDir)) {
             Files.createDirectories(targetDir);
         }

@@ -7,22 +7,7 @@
 
 <div class="adm-main">
     <!-- Topbar -->
-    <div class="adm-topbar">
-        <div>
-            <div class="adm-topbar-title">Bảng điều khiển</div>
-            <div class="adm-topbar-subtitle">Tổng quan hệ thống PolyJobs</div>
-        </div>
-        <div class="d-flex align-items-center gap-3 ms-auto">
-            <div class="text-end">
-                <span class="adm-topbar-user">
-                    <strong th:text="${session.loggedInUser.fullname}">Admin</strong>
-                    Quản trị viên
-                </span>
-            </div>
-            <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=' + session.loggedInUser.fullname + '&background=6366f1&color=fff'}"
-                 class="adm-topbar-avatar" alt="avatar">
-        </div>
-    </div>
+    <div th:replace="~{admin/fragments :: topbar('Bảng điều khiển', 'Tổng quan hệ thống PolyJobs')}"></div>
 
     <div class="adm-content">
         <!-- Breadcrumb -->

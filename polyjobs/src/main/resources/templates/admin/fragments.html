@@ -46,16 +46,72 @@
                 <i class="fa-solid fa-layer-group nav-icon"></i> Danh mục
             </a>
         </li>
+        <li class="adm-nav-item">
+            <a class="adm-nav-link" th:classappend="${activeMenu == 'posts'} ? 'active'" th:href="@{/admin/posts}">
+                <i class="fa-solid fa-newspaper nav-icon"></i> Bài đăng
+            </a>
+        </li>
     </nav>
 
     <div class="adm-sidebar-footer">
         <div class="adm-divider mb-3"></div>
-        <a class="adm-nav-link" href="/logout" style="color: rgba(255,255,255,0.4);">
-            <i class="fa-solid fa-right-from-bracket nav-icon" style="color: #ef4444;"></i>
-            <span>Đăng xuất</span>
-        </a>
+        <form th:action="@{/logout}" method="post" class="m-0 p-0 w-100">
+            <button type="submit" class="adm-nav-link border-0 w-100 text-start" style="background: transparent; color: rgba(255,255,255,0.4);">
+                <i class="fa-solid fa-right-from-bracket nav-icon" style="color: #ef4444;"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </form>
     </div>
 </aside>
+
+<!-- ═══ TOPBAR FRAGMENT ═══ -->
+<div th:fragment="topbar(title, subtitle)" class="adm-topbar">
+    <style>
+        .adm-topbar .dropdown {
+            position: relative;
+        }
+        .adm-topbar .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0;
+        }
+        .adm-topbar .dropdown-menu {
+            top: 100%;
+            right: 0 !important;
+            left: auto !important;
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+    <div>
+        <div class="adm-topbar-title" th:text="${title}">Title</div>
+        <div class="adm-topbar-subtitle" th:text="${subtitle}">Subtitle</div>
+    </div>
+    <div class="d-flex align-items-center gap-3 ms-auto">
+        <div class="dropdown">
+            <div class="d-flex align-items-center gap-3" style="cursor: pointer; padding-bottom: 5px;">
+                <div class="text-end">
+                    <span class="adm-topbar-user">
+                        <strong th:text="${session.loggedInUser.fullname}">Admin</strong>
+                        Quản trị viên
+                    </span>
+                </div>
+                <img th:src="${session.loggedInUser.avatar != null ? session.loggedInUser.avatar : 'https://ui-avatars.com/api/?name=' + session.loggedInUser.fullname + '&background=6366f1&color=fff'}"
+                     class="adm-topbar-avatar" alt="avatar">
+            </div>
+            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: none; border-radius: 12px; margin-top: 5px;">
+                <li><a class="dropdown-item py-2" th:href="@{/profile}"><i class="fa-regular fa-user me-2 text-primary"></i>Thông tin cá nhân</a></li>
+                <li><a class="dropdown-item py-2" th:href="@{/}"><i class="fa-solid fa-house me-2 text-success"></i>Về trang chủ</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <!-- Spring security requires POST for logout by default if CSRF is enabled, but we can use GET if CSRF is disabled or via form -->
+                <!-- Since we have CSRF disabled for /logout or are using GET /logout (Wait, standard Spring Security allows GET /logout if CSRF is disabled or via config) -->
+                <li>
+                    <form th:action="@{/logout}" method="post" class="m-0 p-0">
+                        <button type="submit" class="dropdown-item py-2 text-danger border-0 bg-transparent text-start w-100"><i class="fa-solid fa-right-from-bracket me-2"></i>Đăng xuất</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
 
 <!-- ═══ SCRIPTS FRAGMENT ═══ -->
 <div th:fragment="scripts">
@@ -66,6 +122,56 @@
             setTimeout(() => { el.style.transition = 'opacity .4s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 400); }, 4000);
         });
     </script>
+</div>
+
+<!-- ═══ PHÂN TRANG FRAGMENT ═══ -->
+<!-- Dùng: th:replace="~{admin/fragments :: pagination('/admin/users')}" -->
+<div th:fragment="pagination(baseUrl)">
+  <div th:if="${totalPages != null and totalPages > 1}"
+       style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e8eaf0;">
+
+    <!-- Info -->
+    <div style="font-size:.78rem;color:#94a3b8;">
+      Trang <strong style="color:#1e293b;" th:text="${currentPage + 1}"></strong>
+      / <strong style="color:#1e293b;" th:text="${totalPages}"></strong>
+      &nbsp;·&nbsp; Tổng <strong style="color:#1e293b;" th:text="${totalElements}"></strong> bản ghi
+    </div>
+
+    <!-- Nút trang -->
+    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+
+      <!-- Trang đầu -->
+      <a th:if="${hasPrev}" th:href="${baseUrl + '?page=0'}"
+         class="adm-page-btn" title="Trang đầu">
+        <i class="fa-solid fa-angles-left fa-xs"></i>
+      </a>
+
+      <!-- Trước -->
+      <a th:if="${hasPrev}" th:href="${baseUrl + '?page=' + (currentPage - 1)}"
+         class="adm-page-btn">
+        <i class="fa-solid fa-chevron-left fa-xs"></i>
+      </a>
+
+      <!-- Số trang -->
+      <span th:each="p : ${pageNumbers}">
+        <span th:if="${p == currentPage}" class="adm-page-btn adm-page-active" th:text="${p + 1}"></span>
+        <a th:if="${p != currentPage}" th:href="${baseUrl + '?page=' + p}"
+           class="adm-page-btn" th:text="${p + 1}"></a>
+      </span>
+
+      <!-- Tiếp -->
+      <a th:if="${hasNext}" th:href="${baseUrl + '?page=' + (currentPage + 1)}"
+         class="adm-page-btn">
+        <i class="fa-solid fa-chevron-right fa-xs"></i>
+      </a>
+
+      <!-- Trang cuối -->
+      <a th:if="${hasNext}" th:href="${baseUrl + '?page=' + (totalPages - 1)}"
+         class="adm-page-btn" title="Trang cuối">
+        <i class="fa-solid fa-angles-right fa-xs"></i>
+      </a>
+    </div>
+  </div>
 </div>
 
 </body>

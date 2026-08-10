@@ -13,4 +13,5 @@ public interface ApplicationRepository extends JpaRepository<Application, Intege
     List<Application> findByCandidate(User candidate);
     List<Application> findByJob(Job job);
     List<Application> findByJob_Employer(User employer);
+    boolean existsByResume(com.polyjobs.entity.Resume resume);
 }

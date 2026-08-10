@@ -3,8 +3,10 @@ package com.polyjobs.controller;
 import com.polyjobs.entity.Company;
 import com.polyjobs.entity.User;
 import com.polyjobs.repository.CompanyRepository;
-import com.polyjobs.repository.UserRepository;
+import com.polyjobs.dto.RegisterDTO;
+import com.polyjobs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,50 +14,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import jakarta.servlet.http.HttpSession;
-
 @Controller
 public class AuthController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
-    @Autowired
-    private CompanyRepository companyRepository;
-
-    // ═══ ĐĂNG NHẬP ═══
+    // ═══ ĐĂNG NHẬP (Spring Security xử lý POST /login) ═══
 
     @GetMapping("/login")
-    public String loginPage() {
-        return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(
-            @RequestParam("username") String username,
-            @RequestParam("password") String password,
-            HttpSession session,
-            RedirectAttributes redirectAttributes) {
-
-        username = username != null ? username.trim() : "";
-        password = password != null ? password.trim() : "";
-
-        User user = userRepository.findByUsernameAndPassword(username, password);
-
-        if (user != null) {
-            // Kiểm tra xem tài khoản có bị chặn không
-            if (user.getIsActive() != null && !user.getIsActive()) {
-                redirectAttributes.addFlashAttribute("error", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
-                return "redirect:/login";
-            }
-            
-            // Lưu thông tin user vào session
-            session.setAttribute("loggedInUser", user);
-            return "redirect:/";
-        } else {
-            redirectAttributes.addFlashAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
-            return "redirect:/login";
+    public String loginPage(@RequestParam(value = "error", required = false) String error,
+                            @RequestParam(value = "logout", required = false) String logout,
+                            Model model) {
+        if (error != null) {
+            model.addAttribute("error", "Tên đăng nhập hoặc mật khẩu không đúng!");
         }
+        if (logout != null) {
+            model.addAttribute("success", "Đăng xuất thành công!");
+        }
+        return "login";
     }
 
     // ═══ ĐĂNG KÝ ═══
@@ -85,48 +62,33 @@ public class AuthController {
         email = email != null ? email.trim() : "";
 
         // Kiểm tra username đã tồn tại
-        if (userRepository.existsByUsername(username)) {
+        if (userService.existsByUsername(username)) {
             redirectAttributes.addFlashAttribute("error", "Tên đăng nhập đã được sử dụng!");
             return "redirect:/register";
         }
 
         // Kiểm tra email đã tồn tại
-        if (userRepository.existsByEmail(email)) {
+        if (userService.existsByEmail(email)) {
             redirectAttributes.addFlashAttribute("error", "Email đã được sử dụng!");
             return "redirect:/register";
         }
 
-        // Tạo user mới
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(password);
-        user.setFullname(fullname);
-        user.setEmail(email);
-        user.setPhone(phone);
-        user.setRole(role); // false: Ứng viên | true: Nhà tuyển dụng
+        RegisterDTO registerDTO = new RegisterDTO();
+        registerDTO.setUsername(username);
+        registerDTO.setPassword(password);
+        registerDTO.setFullname(fullname);
+        registerDTO.setEmail(email);
+        registerDTO.setPhone(phone);
+        registerDTO.setRole(role);
+        registerDTO.setCompanyName(companyName);
+        registerDTO.setCompanyAddress(companyAddress);
+        registerDTO.setCompanyWebsite(companyWebsite);
 
-        user = userRepository.save(user);
-
-        // Nếu đăng ký với vai trò Nhà tuyển dụng, tự động tạo hồ sơ Công ty
-        if (Boolean.TRUE.equals(role) && companyName != null && !companyName.trim().isEmpty()) {
-            Company company = new Company();
-            company.setCompanyName(companyName.trim());
-            company.setAddress(companyAddress != null ? companyAddress.trim() : "Đang cập nhật");
-            company.setWebsite(companyWebsite != null ? companyWebsite.trim() : "");
-            company.setDescription("Doanh nghiệp " + companyName.trim() + " hoạt động tại miền Tây Nam Bộ.");
-            company.setEmployer(user);
-            companyRepository.save(company);
-        }
+        userService.registerUser(registerDTO);
 
         redirectAttributes.addFlashAttribute("success", "Đăng ký thành công! Vui lòng đăng nhập.");
         return "redirect:/login";
     }
 
-    // ═══ ĐĂNG XUẤT ═══
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/";
-    }
+    // Logout được Spring Security xử lý tự động, không cần endpoint thủ công nữa.
 }

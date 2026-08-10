@@ -16,12 +16,16 @@ import java.util.Map;
 @RequestMapping("/api/notifications")
 public class NotificationApiController {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.polyjobs.service.UserService userService;
+
     @Autowired
     private NotificationRepository notificationRepository;
 
     @GetMapping
     public ResponseEntity<?> getNotifications(HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
@@ -38,7 +42,8 @@ public class NotificationApiController {
 
     @PostMapping("/read/{id}")
     public ResponseEntity<?> markAsRead(@PathVariable("id") Integer id, HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
@@ -54,7 +59,8 @@ public class NotificationApiController {
 
     @PostMapping("/read-all")
     public ResponseEntity<?> markAllAsRead(HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }

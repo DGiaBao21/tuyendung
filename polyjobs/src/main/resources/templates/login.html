@@ -181,14 +181,20 @@
       <div class="auth-form-sub">Nhập thông tin tài khoản của bạn để tiếp tục</div>
 
       <!-- Alerts -->
+      <div class="auth-alert auth-alert-danger" th:if="${param.error}">
+        <i class="fa-solid fa-circle-exclamation"></i> <span>Tên đăng nhập hoặc mật khẩu không đúng!</span>
+      </div>
       <div class="auth-alert auth-alert-danger" th:if="${error}">
         <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
+      </div>
+      <div class="auth-alert auth-alert-success" th:if="${param.logout}">
+        <i class="fa-solid fa-circle-check"></i> <span>Đăng xuất thành công!</span>
       </div>
       <div class="auth-alert auth-alert-success" th:if="${success}">
         <i class="fa-solid fa-circle-check"></i> <span th:text="${success}"></span>
       </div>
 
-      <form action="/login" method="post" id="loginForm">
+      <form th:action="@{/login}" method="post" id="loginForm">
         <div class="auth-input-group">
           <label for="username">Tên đăng nhập</label>
           <div class="auth-input-row">

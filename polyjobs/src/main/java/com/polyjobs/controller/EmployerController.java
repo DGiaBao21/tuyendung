@@ -20,18 +20,23 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/employer")
 public class EmployerController {
 
     @Autowired
+    private com.polyjobs.service.UserService userService;
+
+    @Autowired
     private JobRepository jobRepository;
 
     @Autowired
     private CompanyRepository companyRepository;
-    
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -46,8 +51,14 @@ public class EmployerController {
 
     // Kiểm tra quyền Nhà tuyển dụng
     private boolean isEmployer(HttpSession session) {
-        User user = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO userDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User user = userDTO != null ? userService.findEntityById(userDTO.getId()) : null;
         return user != null && Boolean.TRUE.equals(user.getRole());
+    }
+
+    private User getEmployer(HttpSession session) {
+        com.polyjobs.dto.UserDTO userDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        return userDTO != null ? userService.findEntityById(userDTO.getId()) : null;
     }
 
     // --- Quản lý tin tuyển dụng ---
@@ -55,10 +66,24 @@ public class EmployerController {
     public String manageJobs(HttpSession session, Model model) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         List<Job> jobs = jobRepository.findByEmployer(employer);
         model.addAttribute("jobs", jobs);
-        
+
+        // Đếm số ứng viên và số đang chờ duyệt cho từng tin
+        Map<Integer, Long> applicationCountMap = new HashMap<>();
+        Map<Integer, Long> pendingCountMap = new HashMap<>();
+        for (Job job : jobs) {
+            List<Application> apps = applicationRepository.findByJob(job);
+            applicationCountMap.put(job.getId(), (long) apps.size());
+            long pendingCount = apps.stream()
+                    .filter(a -> "Chờ duyệt".equals(a.getStatus()))
+                    .count();
+            pendingCountMap.put(job.getId(), pendingCount);
+        }
+        model.addAttribute("applicationCountMap", applicationCountMap);
+        model.addAttribute("pendingCountMap", pendingCountMap);
+
         return "employer/jobs";
     }
 
@@ -72,10 +97,11 @@ public class EmployerController {
     }
 
     @PostMapping("/job/save")
-    public String saveJob(@ModelAttribute Job job, @RequestParam("categoryId") Integer categoryId, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String saveJob(@ModelAttribute Job job, @RequestParam("categoryId") Integer categoryId,
+                          HttpSession session, RedirectAttributes redirectAttributes) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         Company company = companyRepository.findFirstByEmployer(employer);
 
         if (company == null || company.getCompanyName() == null || company.getCompanyName().isEmpty()) {
@@ -117,7 +143,7 @@ public class EmployerController {
     public String showEditJobForm(@PathVariable("id") Integer id, HttpSession session, Model model) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         Job job = jobRepository.findById(id).orElse(null);
 
         if (job == null || !job.getEmployer().getId().equals(employer.getId())) {
@@ -127,15 +153,16 @@ public class EmployerController {
         List<Category> categories = categoryRepository.findAll();
         model.addAttribute("categories", categories);
         model.addAttribute("job", job);
-        
+
         return "employer/job-form";
     }
 
     @PostMapping("/job/toggle-status")
-    public String toggleJobStatus(@RequestParam("id") Integer id, HttpSession session, RedirectAttributes redirectAttributes) {
+    public String toggleJobStatus(@RequestParam("id") Integer id, HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         Job job = jobRepository.findById(id).orElse(null);
 
         if (job != null && job.getEmployer().getId().equals(employer.getId())) {
@@ -147,12 +174,12 @@ public class EmployerController {
         return "redirect:/employer/jobs";
     }
 
-    // --- Quản lý ứng viên ---
+    // --- Quản lý ứng viên theo tin ---
     @GetMapping("/applications/{jobId}")
     public String manageApplications(@PathVariable("jobId") Integer jobId, HttpSession session, Model model) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         Job job = jobRepository.findById(jobId).orElse(null);
 
         if (job == null || !job.getEmployer().getId().equals(employer.getId())) {
@@ -162,6 +189,16 @@ public class EmployerController {
         List<Application> applications = applicationRepository.findByJob(job);
         model.addAttribute("job", job);
         model.addAttribute("applications", applications);
+
+        // Thống kê nhanh
+        long totalCount = applications.size();
+        long pendingCount = applications.stream().filter(a -> "Chờ duyệt".equals(a.getStatus())).count();
+        long approvedCount = applications.stream().filter(a -> "Đã duyệt".equals(a.getStatus())).count();
+        long rejectedCount = applications.stream().filter(a -> "Từ chối".equals(a.getStatus())).count();
+        model.addAttribute("totalCount", totalCount);
+        model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("approvedCount", approvedCount);
+        model.addAttribute("rejectedCount", rejectedCount);
 
         return "employer/applications";
     }
@@ -173,7 +210,7 @@ public class EmployerController {
                                           HttpSession session, RedirectAttributes redirectAttributes) {
         if (!isEmployer(session)) return "redirect:/login";
 
-        User employer = (User) session.getAttribute("loggedInUser");
+        User employer = getEmployer(session);
         Application application = applicationRepository.findById(applicationId).orElse(null);
 
         if (application != null && application.getJob().getEmployer().getId().equals(employer.getId())) {
@@ -187,17 +224,21 @@ public class EmployerController {
             Notification notification = new Notification();
             notification.setUser(application.getCandidate());
             notification.setTitle("Cập nhật trạng thái ứng tuyển: " + application.getJob().getTitle());
-            notification.setContent("Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle() + " tại công ty " + application.getJob().getCompany().getCompanyName() + " đã được cập nhật thành: " + status + (note != null && !note.trim().isEmpty() ? ". Lời nhắn: " + note : ""));
+            notification.setContent("Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle()
+                    + " tại công ty " + application.getJob().getCompany().getCompanyName()
+                    + " đã được cập nhật thành: " + status
+                    + (note != null && !note.trim().isEmpty() ? ". Lời nhắn: " + note : ""));
             notificationRepository.save(notification);
 
             // Gửi thông báo Email
             String emailContent = "Chào " + application.getCandidate().getFullname() + ",\n\n"
-                    + "Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle() 
-                    + " tại công ty " + application.getJob().getCompany().getCompanyName() 
+                    + "Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle()
+                    + " tại công ty " + application.getJob().getCompany().getCompanyName()
                     + " đã được cập nhật thành: " + status + ".\n\n"
                     + (note != null && !note.trim().isEmpty() ? "Lời nhắn từ nhà tuyển dụng: " + note + "\n\n" : "")
                     + "Trân trọng,\nĐội ngũ Polyjobs";
-            emailService.sendSimpleMessage(application.getCandidate().getEmail(), "Polyjobs - Cập nhật trạng thái ứng tuyển", emailContent);
+            emailService.sendSimpleMessage(application.getCandidate().getEmail(),
+                    "Polyjobs - Cập nhật trạng thái ứng tuyển", emailContent);
 
             redirectAttributes.addFlashAttribute("success", "Đã cập nhật trạng thái hồ sơ, gửi thông báo Web và Email tới ứng viên!");
             return "redirect:/employer/applications/" + application.getJob().getId();

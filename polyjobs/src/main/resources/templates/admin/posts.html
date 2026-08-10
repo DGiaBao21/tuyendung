@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{admin/fragments :: head('Quản lý bài đăng')}"></head>
+<body class="adm-body">
+<aside th:replace="~{admin/fragments :: sidebar('posts')}"></aside>
+
+<div class="adm-main">
+  <div th:replace="~{admin/fragments :: topbar('Quản lý bài đăng', 'Kiểm duyệt và xóa bài viết cộng đồng')}"></div>
+
+  <div class="adm-content">
+
+    <!-- Alerts -->
+    <div th:if="${success}" class="adm-alert adm-alert-success mb-4">
+      <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+    </div>
+    <div th:if="${error}" class="adm-alert adm-alert-danger mb-4">
+      <i class="fa-solid fa-triangle-exclamation me-2"></i><span th:text="${error}"></span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-lg-3">
+        <div style="background:#fff;border-radius:14px;padding:18px 20px;border:1px solid #e8eaf0;">
+          <div style="font-size:.78rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">Tổng bài đăng</div>
+          <div style="font-size:2rem;font-weight:800;color:#1e293b;" th:text="${totalPosts}">0</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div style="background:#fff;border-radius:14px;padding:18px 20px;border:1px solid #e8eaf0;">
+          <div style="font-size:.78rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">Hiện đang xem</div>
+          <div style="font-size:2rem;font-weight:800;color:#6366f1;" th:text="${posts.size()}">0</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-lg-3">
+        <div style="background:#fff;border-radius:14px;padding:18px 20px;border:1px solid #e8eaf0;">
+          <div style="font-size:.78rem;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">Bài đang ẩn</div>
+          <div style="font-size:2rem;font-weight:800;color:#f59e0b;" th:text="${hiddenCount}">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter tabs -->
+    <div style="background:#fff;border-radius:14px;border:1px solid #e8eaf0;padding:14px 18px;margin-bottom:20px;overflow-x:auto;">
+      <div class="d-flex gap-2 flex-nowrap align-items-center">
+        <span style="font-size:.78rem;font-weight:700;color:#94a3b8;white-space:nowrap;margin-right:4px;">Lọc:</span>
+        <a th:href="@{/admin/posts}"
+           th:style="${selectedType == 'ALL'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#6366f1;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          Tất cả
+        </a>
+        <a th:href="@{/admin/posts(type='TIM_VIEC')}"
+           th:style="${selectedType == 'TIM_VIEC'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#3b82f6;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          🟦 Tìm việc
+        </a>
+        <a th:href="@{/admin/posts(type='CHIA_SE')}"
+           th:style="${selectedType == 'CHIA_SE'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#22c55e;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          🟩 Chia sẻ
+        </a>
+        <a th:href="@{/admin/posts(type='HOI_DAP')}"
+           th:style="${selectedType == 'HOI_DAP'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#eab308;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          🟨 Hỏi đáp
+        </a>
+        <a th:href="@{/admin/posts(type='TUYEN_DUNG')}"
+           th:style="${selectedType == 'TUYEN_DUNG'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#ef4444;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          🟥 Tuyển dụng
+        </a>
+        <a th:href="@{/admin/posts(type='DU_AN')}"
+           th:style="${selectedType == 'DU_AN'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#a855f7;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          🟪 Dự án
+        </a>
+        <a th:href="@{/admin/posts(type='KY_NANG')}"
+           th:style="${selectedType == 'KY_NANG'} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none;background:#f97316;color:#fff;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:600;text-decoration:none;color:#64748b;border:1.5px solid #e8eaf0;'">
+          📚 Học tập
+        </a>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div style="background:#fff;border-radius:16px;border:1px solid #e8eaf0;overflow:hidden;">
+
+      <!-- Empty state -->
+      <div th:if="${posts == null or posts.isEmpty()}"
+           style="padding:60px 24px;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:12px;">📭</div>
+        <h6 style="font-weight:700;color:#1e293b;margin-bottom:6px;">Không có bài viết nào</h6>
+        <p style="color:#64748b;font-size:.875rem;">Chưa có bài đăng trong danh mục này.</p>
+      </div>
+
+      <table th:if="${posts != null and !posts.isEmpty()}" class="table table-hover mb-0" style="font-size:.875rem;">
+        <thead style="background:#f8fafc;border-bottom:1px solid #e8eaf0;">
+          <tr>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;width:40px;">#</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;">Tác giả</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;">Tiêu đề & Nội dung</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;width:120px;">Loại</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;width:100px;">Trạng thái</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;width:120px;">Ngày đăng</th>
+            <th style="padding:14px 18px;font-weight:700;color:#64748b;font-size:.75rem;text-transform:uppercase;letter-spacing:.04em;width:100px;text-align:center;">Thao tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="post, stat : ${posts}" style="border-bottom:1px solid #f1f5f9;">
+
+            <!-- STT -->
+            <td style="padding:14px 18px;color:#94a3b8;font-size:.8rem;" th:text="${stat.index + 1}"></td>
+
+            <!-- Tác giả -->
+            <td style="padding:14px 18px;">
+              <div class="d-flex align-items-center gap-2">
+                <img th:src="${post.author.avatar != null ? post.author.avatar : 'https://ui-avatars.com/api/?name=' + post.author.fullname + '&background=6366f1&color=fff&size=60'}"
+                     style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0;">
+                <div>
+                  <div style="font-weight:600;color:#1e293b;font-size:.85rem;" th:text="${post.author.fullname}"></div>
+                  <div style="font-size:.72rem;color:#94a3b8;" th:text="${post.author.role == true ? '🏢 NTD' : '👤 Ứng viên'}"></div>
+                </div>
+              </div>
+            </td>
+
+            <!-- Tiêu đề & nội dung -->
+            <td style="padding:14px 18px;max-width:380px;">
+              <div style="font-weight:700;color:#1e293b;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" th:text="${post.title}"></div>
+              <div style="font-size:.8rem;color:#64748b;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.5;" th:text="${post.content}"></div>
+            </td>
+
+            <!-- Loại bài -->
+            <td style="padding:14px 18px;">
+              <span th:switch="${post.type}">
+                <span th:case="'TIM_VIEC'"   style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(59,130,246,.1);color:#1d4ed8;">🟦 Tìm việc</span>
+                <span th:case="'CHIA_SE'"    style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(34,197,94,.1);color:#15803d;">🟩 Chia sẻ</span>
+                <span th:case="'HOI_DAP'"    style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(234,179,8,.1);color:#a16207;">🟨 Hỏi đáp</span>
+                <span th:case="'TUYEN_DUNG'" style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(239,68,68,.1);color:#b91c1c;">🟥 Tuyển dụng</span>
+                <span th:case="'DU_AN'"      style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(168,85,247,.1);color:#6d28d9;">🟪 Dự án</span>
+                <span th:case="'KY_NANG'"    style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(249,115,22,.1);color:#c2410c;">📚 Học tập</span>
+                <span th:case="*"            style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:#f1f5f9;color:#64748b;">📝 Khác</span>
+              </span>
+            </td>
+
+            <!-- Trạng thái ẩn/hiện -->
+            <td style="padding:14px 18px;">
+              <span th:if="${post.isHidden == true}"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(239,68,68,.1);color:#b91c1c;">
+                <i class="fa-solid fa-eye-slash fa-xs"></i> Đang ẩn
+              </span>
+              <span th:if="${post.isHidden == false or post.isHidden == null}"
+                    style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;background:rgba(34,197,94,.1);color:#15803d;">
+                <i class="fa-solid fa-eye fa-xs"></i> Hiện
+              </span>
+            </td>
+
+            <!-- Ngày đăng -->
+            <td style="padding:14px 18px;color:#64748b;font-size:.82rem;">
+              <span th:text="${#dates.format(post.createdDate, 'dd/MM/yyyy')}"></span><br>
+              <span style="color:#94a3b8;font-size:.75rem;" th:text="${#dates.format(post.createdDate, 'HH:mm')}"></span>
+            </td>
+
+            <!-- Nút Ẩn / Hiện -->
+            <td style="padding:14px 18px;text-align:center;">
+              <form th:action="@{/admin/posts/toggle-hide/{id}(id=${post.id})}" method="post" style="margin:0;">
+                <button type="submit"
+                        th:style="${post.isHidden == true} ? 'display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);color:#15803d;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;' : 'display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:8px;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#d97706;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .18s;'"
+                        onmouseover="this.style.opacity='.75'" onmouseout="this.style.opacity='1'">
+                  <i th:classappend="${post.isHidden == true} ? 'fa-eye' : 'fa-eye-slash'" class="fa-solid fa-xs"></i>
+                  <span th:text="${post.isHidden == true} ? 'Hiện lại' : 'Ẩn bài'"></span>
+                </button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Phân trang -->
+  <div th:if="${totalPages != null and totalPages > 1}"
+       style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e8eaf0;">
+
+    <div style="font-size:.78rem;color:#94a3b8;">
+      Trang <strong style="color:#1e293b;" th:text="${currentPage + 1}"></strong>
+      / <strong style="color:#1e293b;" th:text="${totalPages}"></strong>
+      &nbsp;·&nbsp; Tổng <strong style="color:#1e293b;" th:text="${totalElements}"></strong> bài
+    </div>
+
+    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
+      <a th:if="${hasPrev}"
+         th:href="@{/admin/posts(page=0, type=${selectedType != 'ALL' ? selectedType : null})}"
+         class="adm-page-btn" title="Trang đầu">
+        <i class="fa-solid fa-angles-left fa-xs"></i>
+      </a>
+      <a th:if="${hasPrev}"
+         th:href="@{/admin/posts(page=${currentPage - 1}, type=${selectedType != 'ALL' ? selectedType : null})}"
+         class="adm-page-btn">
+        <i class="fa-solid fa-chevron-left fa-xs"></i>
+      </a>
+
+      <span th:each="p : ${pageNumbers}">
+        <span th:if="${p == currentPage}" class="adm-page-btn adm-page-active" th:text="${p + 1}"></span>
+        <a th:if="${p != currentPage}"
+           th:href="@{/admin/posts(page=${p}, type=${selectedType != 'ALL' ? selectedType : null})}"
+           class="adm-page-btn" th:text="${p + 1}"></a>
+      </span>
+
+      <a th:if="${hasNext}"
+         th:href="@{/admin/posts(page=${currentPage + 1}, type=${selectedType != 'ALL' ? selectedType : null})}"
+         class="adm-page-btn">
+        <i class="fa-solid fa-chevron-right fa-xs"></i>
+      </a>
+      <a th:if="${hasNext}"
+         th:href="@{/admin/posts(page=${totalPages - 1}, type=${selectedType != 'ALL' ? selectedType : null})}"
+         class="adm-page-btn" title="Trang cuối">
+        <i class="fa-solid fa-angles-right fa-xs"></i>
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<div th:replace="~{admin/fragments :: scripts}"></div>
+</body>
+</html>

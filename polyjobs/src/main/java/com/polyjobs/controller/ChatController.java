@@ -25,6 +25,9 @@ import java.util.*;
 @Controller
 public class ChatController {
 
+    @org.springframework.beans.factory.annotation.Autowired
+    private com.polyjobs.service.UserService userService;
+
     @Autowired
     private MessageRepository messageRepository;
 
@@ -43,7 +46,8 @@ public class ChatController {
             @RequestParam(value = "userId", required = false) Integer targetUserId,
             HttpSession session, Model model) {
         
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return "redirect:/login";
         }
@@ -80,7 +84,8 @@ public class ChatController {
     @GetMapping("/api/messages/{userId}")
     @ResponseBody
     public ResponseEntity<List<Map<String, Object>>> getConversation(@PathVariable("userId") Integer userId, HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return ResponseEntity.status(401).build();
         }
@@ -118,7 +123,8 @@ public class ChatController {
     @GetMapping("/api/messages/unread-count")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> getUnreadCount(HttpSession session) {
-        User loggedInUser = (User) session.getAttribute("loggedInUser");
+        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
         if (loggedInUser == null) {
             return ResponseEntity.status(401).build();
         }
