@@ -1,4 +1,4 @@
-package com.polyjobs.controller;
+﻿package com.polyjobs.controller;
 
 import com.polyjobs.entity.Company;
 import com.polyjobs.entity.Job;
@@ -223,11 +223,12 @@ public class EmployerController {
             // Gửi thông báo Web
             Notification notification = new Notification();
             notification.setUser(application.getCandidate());
-            notification.setTitle("Cập nhật trạng thái ứng tuyển: " + application.getJob().getTitle());
-            notification.setContent("Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle()
-                    + " tại công ty " + application.getJob().getCompany().getCompanyName()
-                    + " đã được cập nhật thành: " + status
-                    + (note != null && !note.trim().isEmpty() ? ". Lời nhắn: " + note : ""));
+            String emoji = "Trúng tuyển".equals(status) ? "🎉" : ("Từ chối".equals(status) ? "❌" : ("Hẹn phỏng vấn".equals(status) ? "📅" : "🔔"));
+            notification.setTitle(emoji + " Kết quả ứng tuyển: " + application.getJob().getTitle());
+            notification.setContent(
+                "Hồ sơ ứng tuyển vị trí [" + application.getJob().getTitle() + "] tại " + application.getJob().getCompany().getCompanyName()
+                + " đã được cập nhật: " + status
+                + (note != null && !note.trim().isEmpty() ? "\n📝 Nhắn từ HR: " + note : ""));
             notificationRepository.save(notification);
 
             // Gửi thông báo Email

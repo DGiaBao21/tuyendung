@@ -1,4 +1,4 @@
-package com.polyjobs.controller;
+﻿package com.polyjobs.controller;
 
 import com.polyjobs.entity.Resume;
 import com.polyjobs.entity.User;
@@ -27,6 +27,11 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.UUID;
 
 @Controller
@@ -52,6 +57,9 @@ public class ProfileController {
 
     @Autowired
     private com.polyjobs.service.FileUploadService fileUploadService;
+
+    @Value("${app.upload.dir:uploads/}")
+    private String uploadDir;
 
     @GetMapping("/profile")
     public String profilePage(HttpSession session, Model model) {
@@ -272,5 +280,38 @@ public class ProfileController {
         }
 
         return "redirect:/profile";
+    }
+    // ═══ Xem CV trực tiếp trong trình duyệt ═══
+    @GetMapping("/cv/view/{resumeId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> viewCv(@PathVariable("resumeId") Integer resumeId) {
+        Resume resume = resumeRepository.findById(resumeId).orElse(null);
+        if (resume == null || resume.getFileName() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        try {
+            // fileName = "/uploads/cv/xxx.pdf" → map sang đường dẫn thật
+            String relativePath = resume.getFileName().replaceFirst("^/uploads/", "");
+            Path filePath = Paths.get(uploadDir, relativePath).normalize();
+
+            if (!java.nio.file.Files.exists(filePath)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            byte[] content = java.nio.file.Files.readAllBytes(filePath);
+            if (content.length == 0) {
+                return ResponseEntity.noContent().build();
+            }
+
+            String filename = resume.getTitle() != null ? resume.getTitle() : filePath.getFileName().toString();
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + filename + "\"")
+                    .contentType(MediaType.APPLICATION_PDF)
+                    .body(content);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

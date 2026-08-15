@@ -1,4 +1,4 @@
-package com.polyjobs.controller;
+﻿package com.polyjobs.controller;
 
 import com.polyjobs.entity.Job;
 import com.polyjobs.entity.Post;
@@ -25,34 +25,21 @@ import java.util.List;
 @RequestMapping("/admin")
 public class AdminController {
 
-    @Autowired
-    private com.polyjobs.service.UserService userService;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private JobRepository jobRepository;
-
-    @Autowired
-    private CompanyRepository companyRepository;
-
-    @Autowired
-    private ResumeRepository resumeRepository;
-
-    @Autowired
-    private PostRepository postRepository;
-
     private static final int PAGE_SIZE = 10;
 
-    // Middleware check admin
+    @Autowired private com.polyjobs.service.UserService userService;
+    @Autowired private UserRepository userRepository;
+    @Autowired private JobRepository jobRepository;
+    @Autowired private CompanyRepository companyRepository;
+    @Autowired private ResumeRepository resumeRepository;
+    @Autowired private PostRepository postRepository;
+
     private boolean checkAdmin(HttpSession session) {
-        com.polyjobs.dto.UserDTO loggedInUserDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
-        User loggedInUser = loggedInUserDTO != null ? userService.findEntityById(loggedInUserDTO.getId()) : null;
-        return loggedInUser != null && loggedInUser.getIsAdmin() != null && loggedInUser.getIsAdmin();
+        com.polyjobs.dto.UserDTO dto = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        User u = dto != null ? userService.findEntityById(dto.getId()) : null;
+        return u != null && Boolean.TRUE.equals(u.getIsAdmin());
     }
 
-    /** Tạo dải số trang hiển thị (tối đa 5) */
     private List<Integer> pageRange(int current, int total) {
         List<Integer> pages = new ArrayList<>();
         if (total <= 0) return pages;
@@ -66,139 +53,123 @@ public class AdminController {
         return pages;
     }
 
-    private void addPagination(Model model, Page<?> pg, int current) {
+    private void addPageMeta(Model model, Page<?> p, int current) {
         model.addAttribute("currentPage",   current);
-        model.addAttribute("totalPages",    pg.getTotalPages());
-        model.addAttribute("totalElements", pg.getTotalElements());
-        model.addAttribute("hasNext",       pg.hasNext());
-        model.addAttribute("hasPrev",       pg.hasPrevious());
-        model.addAttribute("pageNumbers",   pageRange(current, pg.getTotalPages()));
+        model.addAttribute("totalPages",    p.getTotalPages());
+        model.addAttribute("totalElements", p.getTotalElements());
+        model.addAttribute("hasNext",       p.hasNext());
+        model.addAttribute("hasPrev",       p.hasPrevious());
+        model.addAttribute("pageNumbers",   pageRange(current, p.getTotalPages()));
     }
 
-    // ═══ Dashboard ═══
     @GetMapping("/dashboard")
     public String dashboard(HttpSession session, Model model) {
         if (!checkAdmin(session)) return "redirect:/login";
-
-        model.addAttribute("totalUsers",      userRepository.count());
-        model.addAttribute("totalCandidates", userRepository.findByRole(false).size());
-        model.addAttribute("totalEmployers",  userRepository.findByRole(true).size());
-        model.addAttribute("totalJobs",       jobRepository.count());
-        model.addAttribute("totalCompanies",  companyRepository.count());
-        model.addAttribute("totalResumes",    resumeRepository.count());
-        model.addAttribute("totalPosts",      postRepository.count());
-
+        model.addAttribute("totalUsers",     userRepository.count());
+        model.addAttribute("totalCandidates",userRepository.findByRole(false).size());
+        model.addAttribute("totalEmployers", userRepository.findByRole(true).size());
+        model.addAttribute("totalJobs",      jobRepository.count());
+        model.addAttribute("totalCompanies", companyRepository.count());
+        model.addAttribute("totalResumes",   resumeRepository.count());
+        model.addAttribute("totalPosts",     postRepository.count());
         return "admin/dashboard";
     }
 
-    // ═══ Quản lý người dùng ═══
     @GetMapping("/users")
-    public String users(@RequestParam(value = "page", defaultValue = "0") int page,
+    public String users(@RequestParam(value = "page",   defaultValue = "0")  int page,
+                        @RequestParam(value = "search", required = false)     String search,
                         HttpSession session, Model model) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         PageRequest pr = PageRequest.of(Math.max(0, page), PAGE_SIZE, Sort.by("id").descending());
-        Page<User> pg  = userRepository.findAll(pr);
-
-        model.addAttribute("users", pg.getContent());
-        addPagination(model, pg, page);
+        Page<User> userPage;
+        if (search != null && !search.isBlank()) {
+            userPage = userRepository.findByFullnameContainingIgnoreCaseOrUsernameContainingIgnoreCase(search, search, pr);
+            model.addAttribute("search", search);
+        } else {
+            userPage = userRepository.findAll(pr);
+        }
+        model.addAttribute("users", userPage.getContent());
+        model.addAttribute("baseUrl", "/admin/users?" + (search != null && !search.isBlank() ? "search=" + search + "&" : ""));
+        addPageMeta(model, userPage, page);
         return "admin/users";
     }
 
     @PostMapping("/users/toggle-block/{id}")
-    public String toggleBlockUser(@PathVariable("id") Integer id,
-                                  @RequestParam(value = "page", defaultValue = "0") int page,
-                                  HttpSession session, RedirectAttributes redirectAttributes) {
+    public String toggleBlockUser(@PathVariable("id") Integer id, HttpSession session, RedirectAttributes ra) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         User user = userRepository.findById(id).orElse(null);
         if (user != null) {
             com.polyjobs.dto.UserDTO dto = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
             User me = dto != null ? userService.findEntityById(dto.getId()) : null;
             if (me != null && user.getId().equals(me.getId())) {
-                redirectAttributes.addFlashAttribute("error", "Không thể tự chặn chính mình!");
-                return "redirect:/admin/users?page=" + page;
+                ra.addFlashAttribute("error", "Khong the tu chan chinh minh!");
+                return "redirect:/admin/users";
             }
             user.setIsActive(user.getIsActive() == null || !user.getIsActive());
             userRepository.save(user);
-            String status = user.getIsActive() ? "bỏ chặn" : "chặn";
-            redirectAttributes.addFlashAttribute("success", "Đã " + status + " người dùng: " + user.getUsername());
+            ra.addFlashAttribute("success", "Da " + (user.getIsActive() ? "bo chan" : "chan") + ": " + user.getUsername());
         }
-        return "redirect:/admin/users?page=" + page;
+        return "redirect:/admin/users";
     }
 
-    // ═══ Quản lý tin tuyển dụng ═══
     @GetMapping("/jobs")
-    public String jobs(@RequestParam(value = "page", defaultValue = "0") int page,
-                       HttpSession session, Model model) {
+    public String jobs(@RequestParam(value = "page", defaultValue = "0") int page, HttpSession session, Model model) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         PageRequest pr = PageRequest.of(Math.max(0, page), PAGE_SIZE, Sort.by("id").descending());
-        Page<Job> pg   = jobRepository.findAll(pr);
-
-        model.addAttribute("jobs", pg.getContent());
-        addPagination(model, pg, page);
+        Page<Job> jobPage = jobRepository.findAll(pr);
+        model.addAttribute("jobs", jobPage.getContent());
+        model.addAttribute("baseUrl", "/admin/jobs?");
+        addPageMeta(model, jobPage, page);
         return "admin/jobs";
     }
 
     @PostMapping("/jobs/toggle-hide/{id}")
-    public String toggleHideJob(@PathVariable("id") Integer id,
-                                @RequestParam(value = "page", defaultValue = "0") int page,
-                                HttpSession session, RedirectAttributes redirectAttributes) {
+    public String toggleHideJob(@PathVariable("id") Integer id, HttpSession session, RedirectAttributes ra) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         Job job = jobRepository.findById(id).orElse(null);
         if (job != null) {
             job.setIsHidden(job.getIsHidden() == null || !job.getIsHidden());
             jobRepository.save(job);
-            String status = job.getIsHidden() ? "ẩn" : "hiện";
-            redirectAttributes.addFlashAttribute("success", "Đã " + status + " tin tuyển dụng: " + job.getTitle());
+            ra.addFlashAttribute("success", "Da " + (job.getIsHidden() ? "an" : "hien") + " tin: " + job.getTitle());
         }
-        return "redirect:/admin/jobs?page=" + page;
+        return "redirect:/admin/jobs";
     }
 
-    // ═══ Quản lý bài đăng cộng đồng ═══
     @GetMapping("/posts")
-    public String posts(@RequestParam(value = "type", required = false) String type,
+    public String posts(@RequestParam(value = "type", required = false)   String type,
                         @RequestParam(value = "page", defaultValue = "0") int page,
                         HttpSession session, Model model) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         PageRequest pr = PageRequest.of(Math.max(0, page), PAGE_SIZE);
-        Page<Post> pg;
-
+        Page<Post> postPage;
         if (type != null && !type.isBlank()) {
-            pg = postRepository.findByTypeOrderByCreatedDateDesc(type, pr);
+            postPage = postRepository.findByTypeOrderByCreatedDateDesc(type, pr);
             model.addAttribute("selectedType", type);
         } else {
-            pg = postRepository.findAllByOrderByCreatedDateDesc(pr);
+            postPage = postRepository.findAllByOrderByCreatedDateDesc(pr);
             model.addAttribute("selectedType", "ALL");
         }
-
-        model.addAttribute("posts",      pg.getContent());
-        model.addAttribute("totalPosts", postRepository.count());
-        long hiddenCount = pg.getContent().stream()
-                .filter(p -> Boolean.TRUE.equals(p.getIsHidden())).count();
-        model.addAttribute("hiddenCount", hiddenCount);
-        addPagination(model, pg, page);
+        List<Post> posts = postPage.getContent();
+        model.addAttribute("posts", posts);
+        model.addAttribute("totalPosts",  postRepository.count());
+        model.addAttribute("hiddenCount", posts.stream().filter(p -> Boolean.TRUE.equals(p.getIsHidden())).count());
+        model.addAttribute("baseUrl", "/admin/posts?" + (type != null && !type.isBlank() ? "type=" + type + "&" : ""));
+        addPageMeta(model, postPage, page);
         return "admin/posts";
     }
 
     @PostMapping("/posts/toggle-hide/{id}")
-    public String toggleHidePost(@PathVariable("id") Integer id,
-                                 @RequestParam(value = "page", defaultValue = "0") int page,
-                                 HttpSession session, RedirectAttributes redirectAttributes) {
+    public String toggleHidePost(@PathVariable("id") Integer id, HttpSession session, RedirectAttributes ra) {
         if (!checkAdmin(session)) return "redirect:/login";
-
         Post post = postRepository.findById(id).orElse(null);
         if (post != null) {
             post.setIsHidden(!Boolean.TRUE.equals(post.getIsHidden()));
             postRepository.save(post);
-            String action = Boolean.TRUE.equals(post.getIsHidden()) ? "Ẩn" : "Hiện lại";
-            redirectAttributes.addFlashAttribute("success", action + " bài viết: \"" + post.getTitle() + "\"");
+            String action = Boolean.TRUE.equals(post.getIsHidden()) ? "An" : "Hien lai";
+            ra.addFlashAttribute("success", action + " bai viet: " + post.getTitle());
         } else {
-            redirectAttributes.addFlashAttribute("error", "Không tìm thấy bài viết!");
+            ra.addFlashAttribute("error", "Khong tim thay bai viet!");
         }
-        return "redirect:/admin/posts?page=" + page;
+        return "redirect:/admin/posts";
     }
 }

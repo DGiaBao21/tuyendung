@@ -124,54 +124,66 @@
     </script>
 </div>
 
-<!-- ═══ PHÂN TRANG FRAGMENT ═══ -->
-<!-- Dùng: th:replace="~{admin/fragments :: pagination('/admin/users')}" -->
-<div th:fragment="pagination(baseUrl)">
-  <div th:if="${totalPages != null and totalPages > 1}"
-       style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid #e8eaf0;">
+<!-- ═══ PAGINATION FRAGMENT ═══ -->
+<div th:fragment="pagination(baseUrl)" th:if="${totalPages != null and totalPages > 1}">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-top:20px;">
 
-    <!-- Info -->
-    <div style="font-size:.78rem;color:#94a3b8;">
-      Trang <strong style="color:#1e293b;" th:text="${currentPage + 1}"></strong>
-      / <strong style="color:#1e293b;" th:text="${totalPages}"></strong>
-      &nbsp;·&nbsp; Tổng <strong style="color:#1e293b;" th:text="${totalElements}"></strong> bản ghi
+        <!-- Info text -->
+        <div style="font-size:.8rem;color:#94a3b8;">
+            Trang <strong style="color:#1e293b;" th:text="${currentPage + 1}"></strong>
+            / <strong style="color:#1e293b;" th:text="${totalPages}"></strong>
+            &nbsp;·&nbsp; Tổng <strong style="color:#1e293b;" th:text="${totalElements}"></strong> bản ghi
+        </div>
+
+        <!-- Page buttons -->
+        <div style="display:flex;align-items:center;gap:5px;">
+
+            <!-- Trang đầu -->
+            <a th:if="${hasPrev}" th:href="${baseUrl + '&page=0'}"
+               style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;font-size:.8rem;transition:all .15s;"
+               title="Trang đầu"
+               onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'"
+               onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+              <i class="fa-solid fa-angles-left fa-xs"></i>
+            </a>
+
+            <!-- Trước -->
+            <a th:if="${hasPrev}" th:href="${baseUrl + '&page=' + (currentPage - 1)}"
+               style="display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 12px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;font-size:.82rem;font-weight:600;gap:5px;transition:all .15s;"
+               onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'"
+               onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+              <i class="fa-solid fa-chevron-left fa-xs"></i> Trước
+            </a>
+
+            <!-- Số trang -->
+            <span th:each="p : ${pageNumbers}">
+              <span th:if="${p == currentPage}"
+                    style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:#6366f1;color:#fff;font-size:.82rem;font-weight:700;border:1.5px solid #6366f1;"
+                    th:text="${p + 1}"></span>
+              <a th:if="${p != currentPage}" th:href="${baseUrl + '&page=' + p}" th:text="${p + 1}"
+                 style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;font-size:.82rem;font-weight:600;transition:all .15s;"
+                 onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1';this.style.background='rgba(99,102,241,.06)'"
+                 onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b';this.style.background='#fff'"></a>
+            </span>
+
+            <!-- Tiếp -->
+            <a th:if="${hasNext}" th:href="${baseUrl + '&page=' + (currentPage + 1)}"
+               style="display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 12px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;font-size:.82rem;font-weight:600;gap:5px;transition:all .15s;"
+               onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'"
+               onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+              Tiếp <i class="fa-solid fa-chevron-right fa-xs"></i>
+            </a>
+
+            <!-- Trang cuối -->
+            <a th:if="${hasNext}" th:href="${baseUrl + '&page=' + (totalPages - 1)}"
+               style="display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;text-decoration:none;font-size:.8rem;transition:all .15s;"
+               title="Trang cuối"
+               onmouseover="this.style.borderColor='#6366f1';this.style.color='#6366f1'"
+               onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+              <i class="fa-solid fa-angles-right fa-xs"></i>
+            </a>
+        </div>
     </div>
-
-    <!-- Nút trang -->
-    <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;">
-
-      <!-- Trang đầu -->
-      <a th:if="${hasPrev}" th:href="${baseUrl + '?page=0'}"
-         class="adm-page-btn" title="Trang đầu">
-        <i class="fa-solid fa-angles-left fa-xs"></i>
-      </a>
-
-      <!-- Trước -->
-      <a th:if="${hasPrev}" th:href="${baseUrl + '?page=' + (currentPage - 1)}"
-         class="adm-page-btn">
-        <i class="fa-solid fa-chevron-left fa-xs"></i>
-      </a>
-
-      <!-- Số trang -->
-      <span th:each="p : ${pageNumbers}">
-        <span th:if="${p == currentPage}" class="adm-page-btn adm-page-active" th:text="${p + 1}"></span>
-        <a th:if="${p != currentPage}" th:href="${baseUrl + '?page=' + p}"
-           class="adm-page-btn" th:text="${p + 1}"></a>
-      </span>
-
-      <!-- Tiếp -->
-      <a th:if="${hasNext}" th:href="${baseUrl + '?page=' + (currentPage + 1)}"
-         class="adm-page-btn">
-        <i class="fa-solid fa-chevron-right fa-xs"></i>
-      </a>
-
-      <!-- Trang cuối -->
-      <a th:if="${hasNext}" th:href="${baseUrl + '?page=' + (totalPages - 1)}"
-         class="adm-page-btn" title="Trang cuối">
-        <i class="fa-solid fa-angles-right fa-xs"></i>
-      </a>
-    </div>
-  </div>
 </div>
 
 </body>

@@ -90,5 +90,5 @@ public class AuthController {
         return "redirect:/login";
     }
 
-    // Logout được Spring Security xử lý tự động, không cần endpoint thủ công nữa.
+    
 }

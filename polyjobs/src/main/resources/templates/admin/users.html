@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{admin/fragments :: head('Quản lý Người dùng')}"></head>
 <body class="d-flex">
@@ -133,11 +133,11 @@
             </div>
         </div>
 
-        <!-- Phân trang -->
-        <div th:replace="~{admin/fragments :: pagination('/admin/users')}"></div>
+        <!-- Phan trang -->
+        <div th:replace="~{admin/fragments :: pagination(${baseUrl})}"></div>
 
-    </div>
-</th:block>
+    </div><!-- end adm-content -->
+</div><!-- end adm-main -->
 
 <div th:replace="~{admin/fragments :: scripts}"></div>
 </body>

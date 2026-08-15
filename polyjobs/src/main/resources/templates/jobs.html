@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Tìm Việc Làm Miền Tây')}"></head>
 <body>
@@ -137,6 +137,53 @@
           </div>
         </a>
       </div>
+    </div>
+
+    <!-- ═══ PHAN TRANG ═══ -->
+    <div th:if="${totalPages > 1}"
+         style="display:flex;align-items:center;justify-content:center;gap:8px;padding:40px 0 20px;flex-wrap:wrap;">
+
+        <!-- Thong tin -->
+        <div style="width:100%;text-align:center;font-size:.82rem;color:#64748b;margin-bottom:12px;">
+            Trang <strong th:text="${currentPage + 1}">1</strong> / <strong th:text="${totalPages}">1</strong>
+            &nbsp;·&nbsp; Tổng <strong th:text="${totalResults}">0</strong> việc làm
+        </div>
+
+        <!-- Nut dau trang -->
+        <a th:if="${hasPrev}" th:href="${baseUrl + 'page=0'}"
+           style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;color:#64748b;text-decoration:none;font-size:.8rem;background:#fff;transition:all .2s;"
+           onmouseover="this.style.borderColor='#0ea5e9';this.style.color='#0ea5e9'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+            <i class="fa-solid fa-angles-left fa-xs"></i>
+        </a>
+        <!-- Nut trang truoc -->
+        <a th:if="${hasPrev}" th:href="${baseUrl + 'page=' + (currentPage - 1)}"
+           style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;color:#64748b;text-decoration:none;font-size:.8rem;background:#fff;transition:all .2s;"
+           onmouseover="this.style.borderColor='#0ea5e9';this.style.color='#0ea5e9'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+            <i class="fa-solid fa-chevron-left fa-xs"></i>
+        </a>
+
+        <!-- So trang -->
+        <th:block th:each="p : ${pageNumbers}">
+            <a th:href="${baseUrl + 'page=' + p}" th:text="${p + 1}"
+               th:style="${p == currentPage}
+                   ? 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;background:#0ea5e9;color:#fff;text-decoration:none;font-size:.875rem;font-weight:700;border:1.5px solid #0ea5e9;'
+                   : 'display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;color:#374151;text-decoration:none;font-size:.875rem;background:#fff;transition:all .2s;'"
+               th:onmouseover="${p != currentPage} ? 'this.style.borderColor=\'#0ea5e9\';this.style.color=\'#0ea5e9\'' : ''"
+               th:onmouseout="${p != currentPage}  ? 'this.style.borderColor=\'#e2e8f0\';this.style.color=\'#374151\'' : ''">1</a>
+        </th:block>
+
+        <!-- Nut trang sau -->
+        <a th:if="${hasNext}" th:href="${baseUrl + 'page=' + (currentPage + 1)}"
+           style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;color:#64748b;text-decoration:none;font-size:.8rem;background:#fff;transition:all .2s;"
+           onmouseover="this.style.borderColor='#0ea5e9';this.style.color='#0ea5e9'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+            <i class="fa-solid fa-chevron-right fa-xs"></i>
+        </a>
+        <!-- Nut cuoi trang -->
+        <a th:if="${hasNext}" th:href="${baseUrl + 'page=' + (totalPages - 1)}"
+           style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;border:1.5px solid #e2e8f0;color:#64748b;text-decoration:none;font-size:.8rem;background:#fff;transition:all .2s;"
+           onmouseover="this.style.borderColor='#0ea5e9';this.style.color='#0ea5e9'" onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#64748b'">
+            <i class="fa-solid fa-angles-right fa-xs"></i>
+        </a>
     </div>
 
     <!-- Empty State -->

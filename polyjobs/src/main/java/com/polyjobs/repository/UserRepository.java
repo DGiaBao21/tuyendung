@@ -1,5 +1,7 @@
 package com.polyjobs.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -30,4 +32,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     // Lấy danh sách ngành nghề độc nhất của ứng viên (cho dropdown filter)
     @Query("SELECT DISTINCT u.profession FROM User u WHERE u.role = false AND u.profession IS NOT NULL AND u.profession <> ''")
     List<String> findDistinctProfessions();
+
+    // ỪỢ Phân trang + tìm kiếm (Admin) ỮỢ
+    Page<User> findByFullnameContainingIgnoreCaseOrUsernameContainingIgnoreCase(
+            String fullname, String username, Pageable pageable);
 }

@@ -1,4 +1,4 @@
-package com.polyjobs.config;
+﻿package com.polyjobs.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -43,7 +43,7 @@ public class SecurityConfig {
                     "/companies", "/companies/**",
                     "/candidates", "/candidates/**",
                     "/about",
-                    "/css/**", "/js/**", "/images/**", "/uploads/**",
+                    "/css/**", "/js/**", "/images/**", "/uploads/**", "/cv/view/**",
                     "/ws-chat/**",
                     "/error"
                 ).permitAll()
