@@ -96,10 +96,10 @@
                             <a class="dropdown-item" th:href="@{/profile}"><i class="fa-solid fa-id-card me-2 text-primary"></i> Thông tin cá nhân</a>
                         </li>
                         <li th:if="${session.loggedInUser.role == false and session.loggedInUser.isAdmin != true}">
-                            <a class="dropdown-item" th:href="@{/profile(tab='applications')}"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i> Lịch sử ứng tuyển</a>
+                            <a class="dropdown-item" th:href="@{/my-applications}"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i> Lịch sử ứng tuyển</a>
                         </li>
                         <li th:if="${session.loggedInUser.role == false and session.loggedInUser.isAdmin != true}">
-                            <a class="dropdown-item" th:href="@{/profile(tab='saved')}"><i class="fa-solid fa-heart me-2 text-danger"></i> Việc làm yêu thích</a>
+                            <a class="dropdown-item" th:href="@{/saved-jobs}"><i class="fa-solid fa-heart me-2 text-danger"></i> Việc làm yêu thích</a>
                         </li>
                         
                         <li><hr class="dropdown-divider"></li>

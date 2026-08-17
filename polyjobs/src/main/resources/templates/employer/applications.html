@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments :: head('Ứng viên ứng tuyển')}"></head>
 <body>
@@ -16,6 +16,34 @@
             <a th:href="@{/employer/jobs}" style="display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:10px;border:1.5px solid #e8eaf0;font-size:.835rem;font-weight:600;color:#64748b;text-decoration:none;background:#fff;">
                 <i class="fa-solid fa-arrow-left"></i> Quay lại
             </a>
+        </div>
+
+        <!-- Thống kê nhanh -->
+        <div class="row g-3 mb-4" th:if="${!applications.isEmpty()}">
+            <div class="col-6 col-md-3">
+                <div style="background:#fff;border-radius:12px;border:1.5px solid #e8eaf0;padding:16px 20px;">
+                    <div style="font-size:.78rem;font-weight:700;color:#64748b;text-transform:uppercase;">Tổng ứng viên</div>
+                    <div style="font-size:1.6rem;font-weight:800;color:#1e293b;margin-top:4px;" th:text="${totalCount}">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#fff;border-radius:12px;border:1.5px solid #fef3c7;padding:16px 20px;">
+                    <div style="font-size:.78rem;font-weight:700;color:#d97706;text-transform:uppercase;">Chờ duyệt</div>
+                    <div style="font-size:1.6rem;font-weight:800;color:#d97706;margin-top:4px;" th:text="${pendingCount}">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#fff;border-radius:12px;border:1.5px solid #e0f2fe;padding:16px 20px;">
+                    <div style="font-size:.78rem;font-weight:700;color:#0284c7;text-transform:uppercase;">Hẹn phỏng vấn</div>
+                    <div style="font-size:1.6rem;font-weight:800;color:#0284c7;margin-top:4px;" th:text="${interviewCount}">0</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div style="background:#fff;border-radius:12px;border:1.5px solid #dcfce7;padding:16px 20px;">
+                    <div style="font-size:.78rem;font-weight:700;color:#16a34a;text-transform:uppercase;">Trúng tuyển</div>
+                    <div style="font-size:1.6rem;font-weight:800;color:#16a34a;margin-top:4px;" th:text="${approvedCount}">0</div>
+                </div>
+            </div>
         </div>
 
         <!-- Alerts -->
@@ -38,33 +66,56 @@
                             <!-- Name and Title -->
                             <div>
                                 <div style="font-weight:800;font-size:1.15rem;color:#1e293b;" th:text="${app.candidate.fullname}">Họ tên</div>
-                                <div style="font-size:.875rem;color:#6366f1;margin-top:2px;font-weight:600;" th:text="${app.candidate.profession}">Ngành nghề</div>
+                                <div style="font-size:.875rem;color:#6366f1;margin-top:2px;font-weight:600;" th:text="${app.candidate.profession != null ? app.candidate.profession : 'Ứng viên'}">Ngành nghề</div>
                             </div>
                         </div>
                         <!-- Badge -->
                         <span th:text="${app.status}"
-                              th:style="${app.status == 'Chờ duyệt' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);' : (app.status == 'Từ chối' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);' : (app.status == 'Trúng tuyển' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.2);' : (app.status == 'Hẹn phỏng vấn' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(6,182,212,.1);color:#0891b2;border:1px solid rgba(6,182,212,.2);' : 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')))}"
+                              th:style="${app.status == 'Chờ duyệt' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);' : (app.status == 'Từ chối' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);' : (app.status == 'Trúng tuyển' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(34,197,94,.1);color:#16a34a;border:1px solid rgba(34,197,94,.2);' : (app.status == 'Hẹn phỏng vấn' ? 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:rgba(14,165,233,.12);color:#0284c7;border:1px solid rgba(14,165,233,.3);' : 'padding:6px 16px;border-radius:20px;font-size:.75rem;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;')))}"
                               >Trạng thái</span>
                     </div>
 
                     <!-- Middle Row: Details Grid -->
-                    <div class="row g-3 mb-4">
+                    <div class="row g-3 mb-3">
                         <div class="col-md-6 d-flex flex-column gap-2">
                             <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-envelope me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${app.candidate.email}"></span></span>
                             <span style="font-size:.9rem;color:#475569;" th:if="${app.candidate.phone != null}"><i class="fa-solid fa-phone me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${app.candidate.phone}"></span></span>
                             <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-location-dot me-2" style="color:#94a3b8;width:16px;"></i><span th:text="${#strings.isEmpty(app.candidate.address) ? 'Chưa cập nhật' : app.candidate.address}"></span></span>
-                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-graduation-cap me-2" style="color:#94a3b8;width:16px;"></i><span>FPT Polytechnic</span></span>
                         </div>
                         <div class="col-md-6 d-flex flex-column gap-2">
-                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-briefcase me-2" style="color:#94a3b8;width:16px;"></i><span>1 năm kinh nghiệm</span></span>
-                            <span style="font-size:.9rem;color:#475569;"><i class="fa-solid fa-money-bill-wave me-2" style="color:#94a3b8;width:16px;"></i><span>Thỏa thuận</span></span>
-                            <span style="font-size:.9rem;color:#475569;"><i class="fa-regular fa-calendar me-2" style="color:#94a3b8;width:16px;"></i><span>Nộp ngày: <strong style="color:#333;" th:text="${app.applyDate != null ? #dates.format(app.applyDate, 'dd/MM/yyyy') : ''}"></strong></span></span>
+                            <span style="font-size:.9rem;color:#475569;"><i class="fa-regular fa-calendar me-2" style="color:#94a3b8;width:16px;"></i><span>Nộp ngày: <strong style="color:#333;" th:text="${app.applyDate != null ? #dates.format(app.applyDate, 'dd/MM/yyyy HH:mm') : ''}"></strong></span></span>
+                            <span th:if="${app.note != null and !#strings.isEmpty(app.note)}" style="font-size:.85rem;color:#6366f1;">
+                                <i class="fa-solid fa-comment-dots me-2" style="color:#6366f1;width:16px;"></i><span>Ghi chú HR: <strong th:text="${app.note}"></strong></span>
+                            </span>
                         </div>
                     </div>
 
+                    <!-- Lịch phỏng vấn đã xếp (nếu có) -->
+                    <div th:if="${app.interviewDate != null}"
+                         style="background:linear-gradient(135deg, rgba(14,165,233,.08), rgba(99,102,241,.08)); border:1.5px solid #bae6fd; border-radius:12px; padding:14px 18px; margin-bottom:18px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:40px; height:40px; border-radius:10px; background:#0ea5e9; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1.1rem;">
+                                <i class="fa-solid fa-calendar-check"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:800; font-size:.92rem; color:#0369a1;">
+                                    Lịch phỏng vấn: <span th:text="${#dates.format(app.interviewDate, 'HH:mm - dd/MM/yyyy')}"></span>
+                                </div>
+                                <div th:if="${app.interviewLocation != null and !#strings.isEmpty(app.interviewLocation)}" style="font-size:.83rem; color:#475569; margin-top:2px;">
+                                    <i class="fa-solid fa-location-dot text-danger me-1"></i> <span th:text="${app.interviewLocation}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm rounded-pill px-3 fw-bold"
+                                style="background:#e0f2fe; color:#0284c7; border:1px solid #bae6fd; font-size:.8rem;"
+                                data-bs-toggle="modal" th:attr="data-bs-target='#interviewModal' + ${app.id}">
+                            <i class="fa-solid fa-pen-to-square me-1"></i> Đổi lịch hẹn
+                        </button>
+                    </div>
+
                     <!-- Action Buttons -->
-                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-4">
-                        <!-- View/Message Buttons -->
+                    <div class="d-flex justify-content-between flex-wrap gap-3 align-items-center mb-3">
+                        <!-- View / Message / Profile Buttons -->
                         <div class="d-flex gap-2 flex-wrap">
                             <a th:if="${app.resume != null}" th:href="@{/cv/view/{id}(id=${app.resume.id})}" target="_blank"
                                style="display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;background:rgba(99,102,241,.1);color:#6366f1;font-size:.875rem;font-weight:700;text-decoration:none;transition:all 0.2s;"
@@ -82,54 +133,114 @@
                                 <i class="fa-solid fa-message"></i> Nhắn tin
                             </a>
                         </div>
-                        
-                        <!-- Action Panel: Note + Approve/Reject in one form -->
-                        <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin-top:4px;">
+                    </div>
+
+                    <!-- Action Panel: Note + Status actions -->
+                    <div style="background:#f8fafc;border:1.5px solid #e2e8f0;border-radius:12px;padding:18px 20px;">
+                        <form th:action="@{/employer/application/status}" method="post">
+                            <input type="hidden" name="applicationId" th:value="${app.id}">
+
+                            <!-- Ghi chú HR -->
+                            <div style="margin-bottom:12px;">
+                                <label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
+                                    <i class="fa-solid fa-pencil" style="color:#6366f1;margin-right:5px;"></i> Ghi chú của HR
+                                    <span style="font-weight:400;color:#94a3b8;font-size:.7rem;text-transform:none;letter-spacing:0;margin-left:6px;">(ứng viên sẽ nhận được ghi chú này khi có kết quả)</span>
+                                </label>
+                                <textarea name="note" rows="2" th:text="${app.note}"
+                                          placeholder="VD: Hồ sơ của bạn rất ấn tượng, hẹn gặp bạn sớm... hoặc Chưa phù hợp yêu cầu hiện tại..."
+                                          style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:.875rem;color:#1e293b;resize:vertical;outline:none;font-family:inherit;background:#fff;"
+                                          onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                            </div>
+
+                            <!-- Nút thao tác -->
+                            <div class="d-flex gap-2 flex-wrap align-items-center">
+                                <button type="submit" name="status" value="Trúng tuyển"
+                                        style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;background:#16a34a;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(22,163,74,.25);transition:all .2s;"
+                                        onmouseover="this.style.background='#15803d';this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.background='#16a34a';this.style.transform='translateY(0)'">
+                                    <i class="fa-solid fa-check-circle"></i> Duyệt & Gửi thông báo
+                                </button>
+                                <button type="submit" name="status" value="Từ chối"
+                                        style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;background:#ef4444;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(239,68,68,.25);transition:all .2s;"
+                                        onmouseover="this.style.background='#dc2626';this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.background='#ef4444';this.style.transform='translateY(0)'">
+                                    <i class="fa-solid fa-circle-xmark"></i> Từ chối & Gửi thông báo
+                                </button>
+                                <button type="button"
+                                        data-bs-toggle="modal" th:attr="data-bs-target='#interviewModal' + ${app.id}"
+                                        style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:10px;background:#0ea5e9;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(14,165,233,.25);transition:all .2s;"
+                                        onmouseover="this.style.background='#0284c7';this.style.transform='translateY(-1px)'"
+                                        onmouseout="this.style.background='#0ea5e9';this.style.transform='translateY(0)'">
+                                    <i class="fa-solid fa-calendar-plus"></i> Hẹn phỏng vấn...
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ═══ MODAL HẸN PHỎNG VẤN ═══ -->
+                <div class="modal fade" th:id="'interviewModal' + ${app.id}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content border-0 shadow-lg" style="border-radius:16px;overflow:hidden;">
+                            <div class="modal-header border-0" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;padding:20px 24px;">
+                                <div>
+                                    <h5 class="modal-title fw-bold mb-1"><i class="fa-solid fa-calendar-check me-2"></i>Lên lịch phỏng vấn</h5>
+                                    <div style="font-size:.82rem;opacity:0.9;">Ứng viên: <strong th:text="${app.candidate.fullname}"></strong></div>
+                                </div>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
                             <form th:action="@{/employer/application/status}" method="post">
                                 <input type="hidden" name="applicationId" th:value="${app.id}">
+                                <input type="hidden" name="status" value="Hẹn phỏng vấn">
 
-                                <!-- Ghi chú HR -->
-                                <div style="margin-bottom:12px;">
-                                    <label style="display:block;font-size:.75rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">
-                                        <i class="fa-solid fa-pencil" style="color:#6366f1;margin-right:5px;"></i> Ghi chú của HR
-                                        <span style="font-weight:400;color:#94a3b8;font-size:.7rem;text-transform:none;letter-spacing:0;margin-left:6px;">(ứng viên sẽ nhận được ghi chú này khi có kết quả)</span>
-                                    </label>
-                                    <textarea name="note" rows="2" th:text="${app.note}"
-                                              placeholder="VD: Mời bạn phỏng vấn ngày 20/08 lúc 9h tại văn phòng... hoặc Hồ sơ chưa phù hợp vì..."
-                                              style="width:100%;border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 14px;font-size:.875rem;color:#1e293b;resize:vertical;outline:none;font-family:inherit;background:#fff;"
-                                              onfocus="this.style.borderColor='#6366f1'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+                                <div class="modal-body p-4">
+                                    <!-- Chọn Ngày Giờ -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark" style="font-size:.85rem;">
+                                            <i class="fa-regular fa-calendar-days text-primary me-1"></i> Ngày & Giờ phỏng vấn <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="datetime-local" name="interviewDateStr" required class="form-control"
+                                               style="border-radius:10px;padding:10px 14px;border:1.5px solid #cbd5e1;"
+                                               th:value="${app.interviewDate != null ? #dates.format(app.interviewDate, 'yyyy-MM-dd''T''HH:mm') : ''}">
+                                        <small class="text-muted" style="font-size:.75rem;">Chọn ngày và giờ diễn ra buổi phỏng vấn.</small>
+                                    </div>
+
+                                    <!-- Địa điểm / Hình thức -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark" style="font-size:.85rem;">
+                                            <i class="fa-solid fa-location-dot text-danger me-1"></i> Địa điểm hoặc Link họp Online
+                                        </label>
+                                        <input type="text" name="interviewLocation" class="form-control"
+                                               placeholder="VD: Phòng 402, Tòa nhà ABC hoặc Google Meet: meet.google.com/xyz"
+                                               style="border-radius:10px;padding:10px 14px;border:1.5px solid #cbd5e1;"
+                                               th:value="${app.interviewLocation}">
+                                    </div>
+
+                                    <!-- Lời nhắn / Ghi chú -->
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold text-dark" style="font-size:.85rem;">
+                                            <i class="fa-solid fa-message text-success me-1"></i> Lời nhắn gửi ứng viên
+                                        </label>
+                                        <textarea name="note" rows="3" class="form-control"
+                                                  placeholder="VD: Bạn vui lòng chuẩn bị CV bản in, trang phục lịch sự và có mặt trước 10 phút nhé..."
+                                                  style="border-radius:10px;padding:10px 14px;border:1.5px solid #cbd5e1;"
+                                                  th:text="${app.note}"></textarea>
+                                    </div>
+
+                                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;font-size:.8rem;color:#166534;">
+                                        <i class="fa-solid fa-circle-info me-1"></i> Hệ thống sẽ tự động gửi thông báo trên website và email kèm thông tin lịch hẹn tới ứng viên.
+                                    </div>
                                 </div>
 
-                                <!-- Hiện ghi chú cũ nếu có -->
-                                <div th:if="${app.note != null and !#strings.isEmpty(app.note)}"
-                                     style="background:rgba(99,102,241,.07);border-radius:8px;padding:8px 14px;margin-bottom:12px;font-size:.82rem;color:#4f46e5;">
-                                    <i class="fa-solid fa-note-sticky me-1"></i>
-                                    <strong>Ghi chú hiện tại:</strong> <span th:text="${app.note}"></span>
-                                </div>
-
-                                <!-- 2 nút submit -->
-                                <div class="d-flex gap-2 flex-wrap">
-                                    <button type="submit" name="status" value="Trúng tuyển"
-                                            style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;background:#16a34a;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(22,163,74,.25);transition:all .2s;"
-                                            onmouseover="this.style.background='#15803d';this.style.transform='translateY(-1px)'"
-                                            onmouseout="this.style.background='#16a34a';this.style.transform='translateY(0)'">
-                                        <i class="fa-solid fa-check-circle"></i> Duyệt & Gửi thông báo
-                                    </button>
-                                    <button type="submit" name="status" value="Từ chối"
-                                            style="display:inline-flex;align-items:center;gap:8px;padding:10px 24px;border-radius:10px;background:#ef4444;color:#fff;font-size:.875rem;font-weight:700;border:none;cursor:pointer;box-shadow:0 2px 6px rgba(239,68,68,.25);transition:all .2s;"
-                                            onmouseover="this.style.background='#dc2626';this.style.transform='translateY(-1px)'"
-                                            onmouseout="this.style.background='#ef4444';this.style.transform='translateY(0)'">
-                                        <i class="fa-solid fa-circle-xmark"></i> Từ chối & Gửi thông báo
-                                    </button>
-                                    <button type="submit" name="status" value="Hẹn phỏng vấn"
-                                            style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;background:transparent;border:1.5px solid #0ea5e9;color:#0ea5e9;font-size:.875rem;font-weight:700;cursor:pointer;transition:all .2s;"
-                                            onmouseover="this.style.background='#f0f9ff'"
-                                            onmouseout="this.style.background='transparent'">
-                                        <i class="fa-solid fa-calendar-check"></i> Hẹn phỏng vấn
+                                <div class="modal-footer border-0 bg-light px-4 py-3">
+                                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);border:none;">
+                                        <i class="fa-solid fa-paper-plane me-1"></i> Gửi lịch hẹn & Thông báo
                                     </button>
                                 </div>
                             </form>
                         </div>
+                    </div>
                 </div>
 
                 <!-- Cover Letter Modal -->

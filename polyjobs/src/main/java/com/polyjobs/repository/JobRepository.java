@@ -1,4 +1,4 @@
-﻿package com.polyjobs.repository;
+package com.polyjobs.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

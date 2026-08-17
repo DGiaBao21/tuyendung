@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Lich su ung tuyen')}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('')}" ></nav>
+
+    <div class="container py-5" style="min-height:80vh">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i>Lich sử ứng tuyển
+            </h3>
+            <a th:href="@{/profile}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ
+            </a>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="card shadow-sm border-0" th:if="${applicationPage != null and applicationPage.hasContent()}">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead style="background:linear-gradient(135deg,#0ea5e9,#6366f1);color:#fff;">
+                            <tr>
+                                <th class="px-4 py-3">Công việc</th>
+                                <th class="py-3">Ngày ứng tuyển</th>
+                                <th class="py-3">Trạng thái</th>
+                                <th class="py-3">Ghi chú từ HR</th>
+                                <th class="py-3">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="app : ${applicationPage.content}">
+                                <td class="px-4 py-3">
+                                    <a th:href="@{/job/{id}(id=${app.job.id})}" class="fw-bold text-decoration-none text-dark" th:text="${app.job.title}">Ten cong viec</a>
+                                    <div class="small text-muted mt-1" th:if="${app.job.company != null}">
+                                        <i class="fa-solid fa-building me-1"></i><span th:text="${app.job.company.companyName}"></span>
+                                    </div>
+                                </td>
+                                <td class="py-3"><span th:text="${#dates.format(app.applyDate, 'dd/MM/yyyy')}"></span></td>
+                                <td class="py-3">
+                                    <span class="badge fs-6 px-3 py-2"
+                                        th:classappend="${app.status == 'Cho duyet' ? 'bg-warning text-dark' : (app.status == 'Tu choi' ? 'bg-danger' : (app.status == 'Trung tuyen' ? 'bg-success' : (app.status == 'Hen phong van' ? 'bg-info text-dark' : 'bg-secondary')))}"
+                                        th:text="${app.status}">Trang thai</span>
+                                    <div th:if="${app.interviewDate != null}" class="mt-2 small text-info fw-semibold">
+                                        <i class="fa-solid fa-calendar-check me-1"></i><span th:text="${#dates.format(app.interviewDate, 'dd/MM/yyyy HH:mm')}"></span>
+                                    </div>
+                                    <div th:if="${app.interviewLocation != null and !app.interviewLocation.isEmpty()}" class="small text-secondary">
+                                        <i class="fa-solid fa-location-dot me-1"></i><span th:text="${app.interviewLocation}"></span>
+                                    </div>
+                                </td>
+                                <td class="py-3" style="max-width:260px">
+                                    <div th:if="${app.note != null and !app.note.isEmpty()}" class="p-2 rounded" style="background:#f0f9ff;border-left:3px solid #0ea5e9;font-size:0.88rem;color:#374151;white-space:pre-line;">
+                                        <i class="fa-solid fa-comment-dots me-1 text-primary"></i><span th:text="${app.note}"></span>
+                                    </div>
+                                    <span th:if="${app.note == null or app.note.isEmpty()}" class="text-muted small">-</span>
+                                </td>
+                                <td class="py-3">
+                                    <a th:href="@{/job/{id}(id=${app.job.id})}" class="btn btn-sm btn-outline-primary">
+                                        <i class="fa-solid fa-eye me-1"></i>Xem tin
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Phân trang -->
+            <div class="card-footer bg-white border-0 py-3" th:if="${applicationPage.totalPages > 1}">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        <li class="page-item" th:classappend="${applicationPage.first} ? 'disabled'">
+                            <a class="page-link" th:href="@{/my-applications(page=${applicationPage.number - 1})}" tabindex="-1">Trước</a>
+                        </li>
+                        <li class="page-item" th:each="i : ${#numbers.sequence(0, applicationPage.totalPages - 1)}" 
+                            th:classappend="${applicationPage.number == i} ? 'active'">
+                            <a class="page-link" th:href="@{/my-applications(page=${i})}" th:text="${i + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${applicationPage.last} ? 'disabled'">
+                            <a class="page-link" th:href="@{/my-applications(page=${applicationPage.number + 1})}">Sau</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div th:if="${applicationPage == null or !applicationPage.hasContent()}" class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="fa-solid fa-paper-plane fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">Bạn chưa ứng tuyển công việc nào</h5>
+                <p class="text-muted mb-4">Hãy tìm kiếm và ứng tuyển những công việc phù hợp!</p>
+                <a th:href="@{/jobs}" class="btn btn-primary px-4" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);border:none;">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Tìm việc ngay
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

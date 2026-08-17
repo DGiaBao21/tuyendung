@@ -1,4 +1,4 @@
-﻿package com.polyjobs.controller;
+package com.polyjobs.controller;
 
 import com.polyjobs.entity.Company;
 import com.polyjobs.entity.Job;
@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -49,40 +50,38 @@ public class EmployerController {
     @Autowired
     private EmailService emailService;
 
-    // Kiểm tra quyền Nhà tuyển dụng
+    // Helper: Check if logged-in user is an Employer
     private boolean isEmployer(HttpSession session) {
-        com.polyjobs.dto.UserDTO userDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
-        User user = userDTO != null ? userService.findEntityById(userDTO.getId()) : null;
-        return user != null && Boolean.TRUE.equals(user.getRole());
+        com.polyjobs.dto.UserDTO dto = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        return dto != null && Boolean.TRUE.equals(dto.getRole());
     }
 
     private User getEmployer(HttpSession session) {
-        com.polyjobs.dto.UserDTO userDTO = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
-        return userDTO != null ? userService.findEntityById(userDTO.getId()) : null;
+        com.polyjobs.dto.UserDTO dto = (com.polyjobs.dto.UserDTO) session.getAttribute("loggedInUser");
+        return dto != null ? userService.findEntityById(dto.getId()) : null;
     }
 
     // --- Quản lý tin tuyển dụng ---
     @GetMapping("/jobs")
-    public String manageJobs(HttpSession session, Model model) {
+    public String myJobs(HttpSession session, Model model) {
         if (!isEmployer(session)) return "redirect:/login";
 
         User employer = getEmployer(session);
-        List<Job> jobs = jobRepository.findByEmployer(employer);
+        List<Job> jobs = (employer != null) ? jobRepository.findByEmployer(employer) : new java.util.ArrayList<>();
         model.addAttribute("jobs", jobs);
 
-        // Đếm số ứng viên và số đang chờ duyệt cho từng tin
+        // Đếm số lượng ứng viên theo từng Job
         Map<Integer, Long> applicationCountMap = new HashMap<>();
         Map<Integer, Long> pendingCountMap = new HashMap<>();
-        for (Job job : jobs) {
-            List<Application> apps = applicationRepository.findByJob(job);
-            applicationCountMap.put(job.getId(), (long) apps.size());
-            long pendingCount = apps.stream()
-                    .filter(a -> "Chờ duyệt".equals(a.getStatus()))
-                    .count();
-            pendingCountMap.put(job.getId(), pendingCount);
+        for (Job j : jobs) {
+            List<Application> apps = applicationRepository.findByJob(j);
+            applicationCountMap.put(j.getId(), (long) (apps != null ? apps.size() : 0));
+            long pending = (apps != null) ? apps.stream().filter(a -> "Chờ duyệt".equals(a.getStatus())).count() : 0L;
+            pendingCountMap.put(j.getId(), pending);
         }
         model.addAttribute("applicationCountMap", applicationCountMap);
         model.addAttribute("pendingCountMap", pendingCountMap);
+        model.addAttribute("appCounts", applicationCountMap);
 
         return "employer/jobs";
     }
@@ -193,10 +192,12 @@ public class EmployerController {
         // Thống kê nhanh
         long totalCount = applications.size();
         long pendingCount = applications.stream().filter(a -> "Chờ duyệt".equals(a.getStatus())).count();
-        long approvedCount = applications.stream().filter(a -> "Đã duyệt".equals(a.getStatus())).count();
+        long interviewCount = applications.stream().filter(a -> "Hẹn phỏng vấn".equals(a.getStatus())).count();
+        long approvedCount = applications.stream().filter(a -> "Trúng tuyển".equals(a.getStatus())).count();
         long rejectedCount = applications.stream().filter(a -> "Từ chối".equals(a.getStatus())).count();
         model.addAttribute("totalCount", totalCount);
         model.addAttribute("pendingCount", pendingCount);
+        model.addAttribute("interviewCount", interviewCount);
         model.addAttribute("approvedCount", approvedCount);
         model.addAttribute("rejectedCount", rejectedCount);
 
@@ -207,6 +208,8 @@ public class EmployerController {
     public String updateApplicationStatus(@RequestParam("applicationId") Integer applicationId,
                                           @RequestParam("status") String status,
                                           @RequestParam(value = "note", required = false) String note,
+                                          @RequestParam(value = "interviewDateStr", required = false) String interviewDateStr,
+                                          @RequestParam(value = "interviewLocation", required = false) String interviewLocation,
                                           HttpSession session, RedirectAttributes redirectAttributes) {
         if (!isEmployer(session)) return "redirect:/login";
 
@@ -216,30 +219,102 @@ public class EmployerController {
         if (application != null && application.getJob().getEmployer().getId().equals(employer.getId())) {
             application.setStatus(status);
             if (note != null) {
-                application.setNote(note);
+                application.setNote(note.trim());
             }
+
+            // Xử lý ngày giờ phỏng vấn nếu có
+            Date interviewDate = null;
+            if (interviewDateStr != null && !interviewDateStr.trim().isEmpty()) {
+                try {
+                    if (interviewDateStr.trim().length() == 16) {
+                        interviewDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm").parse(interviewDateStr.trim());
+                    } else if (interviewDateStr.trim().length() >= 19) {
+                        interviewDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").parse(interviewDateStr.trim());
+                    }
+                } catch (Exception ignored) {}
+            }
+
+            if ("Hẹn phỏng vấn".equals(status)) {
+                if (interviewDate != null) {
+                    application.setInterviewDate(interviewDate);
+                }
+                if (interviewLocation != null && !interviewLocation.trim().isEmpty()) {
+                    application.setInterviewLocation(interviewLocation.trim());
+                }
+            }
+
             applicationRepository.save(application);
+
+            String formattedInterviewDate = "";
+            if (application.getInterviewDate() != null) {
+                formattedInterviewDate = new SimpleDateFormat("HH:mm 'ngày' dd/MM/yyyy").format(application.getInterviewDate());
+            }
 
             // Gửi thông báo Web
             Notification notification = new Notification();
             notification.setUser(application.getCandidate());
-            String emoji = "Trúng tuyển".equals(status) ? "🎉" : ("Từ chối".equals(status) ? "❌" : ("Hẹn phỏng vấn".equals(status) ? "📅" : "🔔"));
-            notification.setTitle(emoji + " Kết quả ứng tuyển: " + application.getJob().getTitle());
-            notification.setContent(
-                "Hồ sơ ứng tuyển vị trí [" + application.getJob().getTitle() + "] tại " + application.getJob().getCompany().getCompanyName()
-                + " đã được cập nhật: " + status
-                + (note != null && !note.trim().isEmpty() ? "\n📝 Nhắn từ HR: " + note : ""));
+
+            if ("Hẹn phỏng vấn".equals(status)) {
+                notification.setTitle("📅 Lời mời phỏng vấn: " + application.getJob().getTitle());
+                StringBuilder notifContent = new StringBuilder();
+                notifContent.append("Công ty ").append(application.getJob().getCompany().getCompanyName())
+                            .append(" đã gửi lời mời phỏng vấn cho vị trí [").append(application.getJob().getTitle()).append("].");
+                if (!formattedInterviewDate.isEmpty()) {
+                    notifContent.append("\n⏰ Thời gian: ").append(formattedInterviewDate);
+                }
+                if (application.getInterviewLocation() != null && !application.getInterviewLocation().isEmpty()) {
+                    notifContent.append("\n📍 Địa điểm / Hình thức: ").append(application.getInterviewLocation());
+                }
+                if (note != null && !note.trim().isEmpty()) {
+                    notifContent.append("\n📝 Lời nhắn từ HR: ").append(note.trim());
+                }
+                notification.setContent(notifContent.toString());
+            } else {
+                String emoji = "Trúng tuyển".equals(status) ? "🎉" : ("Từ chối".equals(status) ? "❌" : "🔔");
+                notification.setTitle(emoji + " Kết quả ứng tuyển: " + application.getJob().getTitle());
+                StringBuilder notifContent = new StringBuilder();
+                notifContent.append("Hồ sơ ứng tuyển vị trí [").append(application.getJob().getTitle()).append("] tại ")
+                            .append(application.getJob().getCompany().getCompanyName())
+                            .append(" đã được cập nhật: ").append(status);
+                if (note != null && !note.trim().isEmpty()) {
+                    notifContent.append("\n📝 Lời nhắn từ HR: ").append(note.trim());
+                }
+                notification.setContent(notifContent.toString());
+            }
             notificationRepository.save(notification);
 
             // Gửi thông báo Email
-            String emailContent = "Chào " + application.getCandidate().getFullname() + ",\n\n"
-                    + "Trạng thái hồ sơ của bạn cho vị trí " + application.getJob().getTitle()
-                    + " tại công ty " + application.getJob().getCompany().getCompanyName()
-                    + " đã được cập nhật thành: " + status + ".\n\n"
-                    + (note != null && !note.trim().isEmpty() ? "Lời nhắn từ nhà tuyển dụng: " + note + "\n\n" : "")
-                    + "Trân trọng,\nĐội ngũ Polyjobs";
-            emailService.sendSimpleMessage(application.getCandidate().getEmail(),
-                    "Polyjobs - Cập nhật trạng thái ứng tuyển", emailContent);
+            StringBuilder emailContent = new StringBuilder();
+            emailContent.append("Chào ").append(application.getCandidate().getFullname()).append(",\n\n");
+            if ("Hẹn phỏng vấn".equals(status)) {
+                emailContent.append("Công ty ").append(application.getJob().getCompany().getCompanyName())
+                            .append(" trân trọng mời bạn tham gia buổi phỏng vấn cho vị trí: ")
+                            .append(application.getJob().getTitle()).append(".\n\n");
+                if (!formattedInterviewDate.isEmpty()) {
+                    emailContent.append("⏰ Thời gian: ").append(formattedInterviewDate).append("\n");
+                }
+                if (application.getInterviewLocation() != null && !application.getInterviewLocation().isEmpty()) {
+                    emailContent.append("📍 Địa điểm / Hình thức: ").append(application.getInterviewLocation()).append("\n");
+                }
+                if (note != null && !note.trim().isEmpty()) {
+                    emailContent.append("📝 Lời nhắn từ Nhà tuyển dụng: ").append(note.trim()).append("\n");
+                }
+                emailContent.append("\nVui lòng chuẩn bị và tham gia đúng giờ. Chúc bạn có một buổi phỏng vấn thành công!\n\n");
+            } else {
+                emailContent.append("Trạng thái hồ sơ của bạn cho vị trí ").append(application.getJob().getTitle())
+                            .append(" tại công ty ").append(application.getJob().getCompany().getCompanyName())
+                            .append(" đã được cập nhật thành: ").append(status).append(".\n\n");
+                if (note != null && !note.trim().isEmpty()) {
+                    emailContent.append("Lời nhắn từ nhà tuyển dụng: ").append(note.trim()).append("\n\n");
+                }
+            }
+            emailContent.append("Trân trọng,\nĐội ngũ Polyjobs");
+
+            String emailSubject = "Hẹn phỏng vấn".equals(status) 
+                    ? "Polyjobs - Lời mời phỏng vấn vị trí " + application.getJob().getTitle()
+                    : "Polyjobs - Cập nhật trạng thái ứng tuyển";
+
+            emailService.sendSimpleMessage(application.getCandidate().getEmail(), emailSubject, emailContent.toString());
 
             redirectAttributes.addFlashAttribute("success", "Đã cập nhật trạng thái hồ sơ, gửi thông báo Web và Email tới ứng viên!");
             return "redirect:/employer/applications/" + application.getJob().getId();

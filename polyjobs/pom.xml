@@ -28,6 +28,7 @@
 	</scm>
 	<properties>
 		<java.version>26</java.version>
+		<start-class>com.polyjobs.PolyjobsApplication</start-class>
 	</properties>
 	<dependencies>
 
@@ -91,13 +92,14 @@
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
 
-		<!-- DevTools: auto-restart + LiveReload -->
+		<!-- DevTools: disabled to prevent Java 26 classloader conflicts
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		-->
 	</dependencies>
 
 	<build>
@@ -106,6 +108,7 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
+					<mainClass>com.polyjobs.PolyjobsApplication</mainClass>
 					<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>

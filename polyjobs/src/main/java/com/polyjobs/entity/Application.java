@@ -30,7 +30,13 @@ public class Application {
     @Temporal(TemporalType.TIMESTAMP)
     private Date applyDate = new Date();
 
-    private String status = "Chờ duyệt"; // Chờ duyệt, Đã xem, Từ chối, Trúng tuyển
+    private String status = "Chờ duyệt"; // Chờ duyệt, Đã xem, Từ chối, Trúng tuyển, Hẹn phỏng vấn
 
     private String note;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date interviewDate;
+
+    @Column(columnDefinition = "NVARCHAR(500)")
+    private String interviewLocation;
 }

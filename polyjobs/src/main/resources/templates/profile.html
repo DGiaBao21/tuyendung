@@ -115,72 +115,7 @@
 
 
 
-                <!-- Lịch sử ứng tuyển (Only for Candidate) -->
-                <div class="card p-4 fade-in-up mt-4" th:if="${user.role == false}" id="section-applications">
-                    <h5 class="mb-4"><i class="fa-solid fa-clock-rotate-left me-2 text-warning"></i>Lịch sử ứng tuyển</h5>
-                    <div class="table-responsive" th:if="${applications != null and !applications.isEmpty()}">
-                        <table class="table table-hover align-middle border">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Công việc</th>
-                                    <th>Ngày ứng tuyển</th>
-                                    <th>Trạng thái</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="app : ${applications}">
-                                    <td>
-                                        <a th:href="@{/job/{id}(id=${app.job.id})}" class="fw-bold text-decoration-none" th:text="${app.job.title}">Tên công việc</a>
-                                        <div class="small text-muted" th:text="${app.job.company != null ? app.job.company.companyName : ''}">Công ty</div>
-                                    </td>
-                                    <td th:text="${#dates.format(app.applyDate, 'dd/MM/yyyy')}">01/01/2026</td>
-                                    <td>
-                                        <span class="badge" th:classappend="${app.status == 'Chờ duyệt' ? 'bg-warning text-dark' : (app.status == 'Từ chối' ? 'bg-danger' : 'bg-success')}" th:text="${app.status}">Trạng thái</span>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div th:if="${applications == null or applications.isEmpty()}" class="alert alert-light border text-center text-muted">
-                        <i class="fa-solid fa-paper-plane mb-2 fs-3"></i><br>
-                        Bạn chưa ứng tuyển công việc nào.
-                    </div>
-                </div>
-
-                <!-- Việc làm đã lưu (Only for Candidate) -->
-                <div class="card p-4 fade-in-up mt-4" th:if="${user.role == false}" id="section-saved">
-                    <h5 class="mb-4"><i class="fa-solid fa-heart me-2 text-danger"></i>Việc làm yêu thích</h5>
-                    <div class="table-responsive" th:if="${savedJobs != null and !savedJobs.isEmpty()}">
-                        <table class="table table-hover align-middle border">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Công việc</th>
-                                    <th>Ngày lưu</th>
-                                    <th>Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="saved : ${savedJobs}">
-                                    <td>
-                                        <a th:href="@{/job/{id}(id=${saved.job.id})}" class="fw-bold text-decoration-none" th:text="${saved.job.title}">Tên công việc</a>
-                                        <div class="small text-muted" th:text="${saved.job.company != null ? saved.job.company.companyName : ''}">Công ty</div>
-                                    </td>
-                                    <td th:text="${#dates.format(saved.saveDate, 'dd/MM/yyyy')}">01/01/2026</td>
-                                    <td>
-                                        <form th:action="@{/job/save}" method="post">
-                                            <input type="hidden" name="jobId" th:value="${saved.job.id}">
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-heart-crack"></i> Bỏ lưu</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div th:if="${savedJobs == null or savedJobs.isEmpty()}" class="alert alert-light border text-center text-muted">
-                        <i class="fa-solid fa-heart mb-2 fs-3"></i><br>
-                        Bạn chưa lưu công việc nào.
-                    </div>
-                </div>
+                
             </div>
         </div>
     </div>

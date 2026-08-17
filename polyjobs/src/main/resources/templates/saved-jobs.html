@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Viec lam yeu thich')}"></head>
+<body>
+    <nav th:replace="~{fragments :: navbar('')}" ></nav>
+
+    <div class="container py-5" style="min-height:80vh">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="fa-solid fa-heart me-2 text-danger"></i>Việc làm yêu thích
+            </h3>
+            <a th:href="@{/profile}" class="btn btn-outline-secondary btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i> Quay lại hồ sơ
+            </a>
+        </div>
+
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i><span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" th:if="${savedJobPage != null and savedJobPage.hasContent()}">
+            <div class="col" th:each="saved : ${savedJobPage.content}">
+                <div class="card h-100 border-0 shadow-sm" style="transition:transform .2s,box-shadow .2s;" onmouseenter="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.12)'" onmouseleave="this.style.transform='';this.style.boxShadow=''">
+                    <div class="card-body d-flex flex-column p-4">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rounded me-3 overflow-hidden flex-shrink-0" style="width:50px;height:50px;background:#f0f9ff;">
+                                <img th:if="${saved.job.company != null and saved.job.company.logo != null}"
+                                     th:src="@{${saved.job.company.logo}}" alt="Logo"
+                                     style="width:100%;height:100%;object-fit:contain;">
+                                <div th:if="${saved.job.company == null or saved.job.company.logo == null}"
+                                     class="w-100 h-100 d-flex align-items-center justify-content-center">
+                                    <i class="fa-solid fa-building text-muted"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold mb-0 lh-sm">
+                                    <a th:href="@{/job/{id}(id=${saved.job.id})}" class="text-decoration-none text-dark"
+                                       th:text="${saved.job.title}">Ten cong viec</a>
+                                </h6>
+                                <small class="text-muted" th:if="${saved.job.company != null}" th:text="${saved.job.company.companyName}">Cong ty</small>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 small text-muted">
+                            <span th:if="${saved.job.location != null}">
+                                <i class="fa-solid fa-location-dot me-1 text-primary"></i>
+                                <span th:text="${saved.job.location}"></span>
+                            </span>
+                        </div>
+
+                        <p class="text-muted small mb-3 flex-grow-1"
+                           th:if="${saved.job.salary != null}"
+                           th:text="'Luong: ' + ${saved.job.salary}"></p>
+
+                        <div class="d-flex align-items-center justify-content-between mt-auto pt-2 border-top">
+                            <small class="text-muted">
+                                <i class="fa-regular fa-calendar me-1"></i>
+                                <span th:text="${#dates.format(saved.saveDate, 'dd/MM/yyyy')}">Ngay luu</span>
+                            </small>
+                            <div class="d-flex gap-2">
+                                <a th:href="@{/job/{id}(id=${saved.job.id})}" class="btn btn-sm btn-primary"
+                                   style="background:linear-gradient(135deg,#0ea5e9,#6366f1);border:none;">
+                                    <i class="fa-solid fa-eye me-1"></i>Xem
+                                </a>
+                                <form th:action="@{/job/save}" method="post" class="m-0">
+                                    <input type="hidden" name="jobId" th:value="${saved.job.id}">
+                                    <input type="hidden" name="from" value="saved-jobs">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fa-solid fa-heart-crack me-1"></i>Bỏ lưu
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Phân trang -->
+        <div class="d-flex justify-content-center mt-5" th:if="${savedJobPage != null and savedJobPage.totalPages > 1}">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0 shadow-sm">
+                    <li class="page-item" th:classappend="${savedJobPage.first} ? 'disabled'">
+                        <a class="page-link" th:href="@{/saved-jobs(page=${savedJobPage.number - 1})}" tabindex="-1">
+                            <i class="fa-solid fa-angle-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item" th:each="i : ${#numbers.sequence(0, savedJobPage.totalPages - 1)}" 
+                        th:classappend="${savedJobPage.number == i} ? 'active'">
+                        <a class="page-link" th:href="@{/saved-jobs(page=${i})}" th:text="${i + 1}">1</a>
+                    </li>
+                    <li class="page-item" th:classappend="${savedJobPage.last} ? 'disabled'">
+                        <a class="page-link" th:href="@{/saved-jobs(page=${savedJobPage.number + 1})}">
+                            <i class="fa-solid fa-angle-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div th:if="${savedJobPage == null or !savedJobPage.hasContent()}" class="card border-0 shadow-sm text-center py-5">
+            <div class="card-body">
+                <i class="fa-solid fa-heart fs-1 text-muted mb-3"></i>
+                <h5 class="text-muted">Ban chua luu cong viec nao</h5>
+                <p class="text-muted mb-4">Luu nhung cong viec yeu thich de de dang tim lai sau!</p>
+                <a th:href="@{/jobs}" class="btn btn-primary px-4" style="background:linear-gradient(135deg,#0ea5e9,#6366f1);border:none;">
+                    <i class="fa-solid fa-magnifying-glass me-2"></i>Kham pha viec lam
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <footer th:replace="~{fragments :: footer}"></footer>
+    <div th:replace="~{fragments :: scripts}"></div>
+</body>
+</html>

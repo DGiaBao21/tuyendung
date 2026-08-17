@@ -136,6 +136,7 @@ public class JobController {
     // Lưu / Bỏ lưu việc làm
     @PostMapping("/job/save")
     public String toggleSaveJob(@RequestParam("jobId") Integer jobId,
+                                @RequestParam(value = "from", required = false) String from,
                                 HttpSession session,
                                 RedirectAttributes redirectAttributes) {
 
@@ -169,6 +170,9 @@ public class JobController {
             }
         }
 
+        if ("saved-jobs".equals(from)) {
+            return "redirect:/saved-jobs";
+        }
         return "redirect:/job/" + jobId;
     }
 }

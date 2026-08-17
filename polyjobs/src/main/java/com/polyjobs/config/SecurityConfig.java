@@ -1,4 +1,4 @@
-﻿package com.polyjobs.config;
+package com.polyjobs.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
