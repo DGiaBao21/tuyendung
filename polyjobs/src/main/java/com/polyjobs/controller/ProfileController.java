@@ -25,39 +25,24 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-package com.polyjobs.controller;
-
-import com.polyjobs.entity.Resume;
-import com.polyjobs.entity.User;
-import com.polyjobs.entity.Application;
-import com.polyjobs.entity.SavedJob;
-import com.polyjobs.repository.ResumeRepository;
-import com.polyjobs.repository.UserRepository;
-import com.polyjobs.repository.ApplicationRepository;
-import com.polyjobs.repository.SavedJobRepository;
-import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ResponseBody;
+import java.util.UUID;
+
+@Controller
+public class ProfileController {
+
+    @Autowired
+    private UserRepository userRepository;
+
     @Autowired
     private ResumeRepository resumeRepository;
 
